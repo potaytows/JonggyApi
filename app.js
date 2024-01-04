@@ -29,7 +29,6 @@ const uri = "mongodb+srv://finalProject:EFpeUnSek3qtwsMf@cluster0.xoovbhu.mongod
 mongoose.connect(uri2)
 .then((result)=> app.listen(8000, () => {
   console.log('API is running on ports 8000 http://localhost:8000/');
-  console.log("hi this is from chi's branch")
 }))
     .catch((err) => console.log(err))
 app.use(function(req, res, next) {
