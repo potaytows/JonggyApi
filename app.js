@@ -29,7 +29,7 @@ app.use('/login',loginRouter);
 
 const uri2 = "mongodb://127.0.0.1:27017/dragdrop";
 const uri = "mongodb+srv://finalProject:EFpeUnSek3qtwsMf@cluster0.xoovbhu.mongodb.net/finalProject?retryWrites=true&w=majority" 
-mongoose.connect(uri2)
+mongoose.connect(uri)
 .then((result)=> app.listen(8000, () => {
   console.log('API is running on ports 8000 http://localhost:8000/');
 }))
