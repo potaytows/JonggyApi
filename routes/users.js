@@ -14,6 +14,7 @@ router.get('/getusers', async function(req, res, next) {
   const result = await UserModel.findOne({}, { 'password': 0 })
   res.json(result)
 });
+
 router.get('/auth', async function(req, res, next) {
   const result = await UserModel.findOne({ 'email': req.body.email, 'password': req.body.password }, { 'password': 0 })
   if(result){
