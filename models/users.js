@@ -16,17 +16,18 @@ const UserSchema = new mongoose.Schema({
     password:{
         type:String,
         required:true,
-        unique:true
     },
     birthday:{
         type:String,
         required:true,
-        unique:true
     },
     phonenumber:{
         type:String,
         required:true
-    },
+    },role:{
+        type:String,
+        default:"normal user"
+    }
 },{timestamps:true})
 
 
