@@ -16,12 +16,10 @@ const UserSchema = new mongoose.Schema({
     password:{
         type:String,
         required:true,
-        unique:true
     },
     birthday:{
         type:String,
         required:true,
-        unique:true
     },
     phonenumber:{
         type:String,
@@ -29,10 +27,6 @@ const UserSchema = new mongoose.Schema({
     },role:{
         type:String,
         default:"normal user"
-    },bday:{
-        type:Date
-    },tel:{
-        type:Number
     }
 },{timestamps:true})
 
