@@ -41,13 +41,14 @@ router.get('/auth', async function (req, res, next) {
 router.post('/addUser', async function (req, res, next) {
   try {
     const usedEmail = await UserModel.find({}, { 'email': 1, '_id': 0 })
-    if (!contains(usedEmail, "email", req.body.email)) {
+    const usedUsername = await UserModel.find({}, { 'username': 1, '_id': 0 })
+    if (!contains(usedEmail, "email", req.body.email) && !contains(usedUsername, "username", req.body.username)) {
       const newuser = await new UserModel(req.body)
       const result = await newuser.save();
       res.json({ "status": "added", "obj": result });
 
     } else {
-      res.json({ "error": 'this email is taken' })
+      res.json({ "error": 'this email or username is already taken!!' })
     }
 
   } catch (error) {
