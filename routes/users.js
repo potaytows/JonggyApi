@@ -3,37 +3,59 @@ const router = express.Router();
 const UserModel = require('../models/users');
 
 function contains(arr, key, val) {
-  for (let i = 0; i < arr.length; i++) {
+
+  for (var i = 0; i < arr.length; i++) {
     if (arr[i][key] === val) return true;
   }
   return false;
 }
 
-router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
 
+router.get('/getusers', async function (req, res, next) {
   try {
-    // ตรวจสอบการล็อกอินในฐานข้อมูลของคุณ
-    const user = await UserModel.findOne({ username, password });
+    const result = await UserModel.find({}, { 'password': 0 })
+    res.json(result)
 
-    if (user) {
-      res.status(200).json({ message: 'เข้าสู่ระบบสำเร็จ' });
-    } else {
-      res.status(401).json({ message: 'ล็อกอินไม่สำเร็จ' });
-    }
   } catch (error) {
-    res.status(500).json({ error: 'มีข้อผิดพลาดในการตรวจสอบการล็อกอิน' });
+    res.send(error)
   }
+
 });
 
-
-router.get('/getusers', async function(req, res, next) {
+router.post('/auth', async function (req, res, next) {
   try {
-    const result = await UserModel.find({}, { 'password': 0 });
-    res.json(result);
+    const result = await UserModel.findOne({ 'username': req.body.username, 'password': req.body.password }, { 'password': 0 })
+    if (result) {
+      res.json({ "status": "auth success", "obj": result })
+
+    } else {
+      res.json({ "status": "auth failed" })
+    } 
+
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred while fetching users' });
+    res.send(error)
   }
+
+
+});
+
+router.post('/addUser', async function (req, res, next) {
+  try {
+    const usedEmail = await UserModel.find({}, { 'email': 1, '_id': 0 })
+    const usedUsername = await UserModel.find({}, { 'username': 1, '_id': 0 })
+    if (!contains(usedEmail, "email", req.body.email) && !contains(usedUsername, "username", req.body.username)) {
+      const newuser = await new UserModel(req.body)
+      const result = await newuser.save();
+      res.json({ "status": "added", "obj": result });
+
+    } else {
+      res.json({ "error": 'this email or username is already taken!!' })
+    }
+
+  } catch (error) {
+    res.send(error)
+  }
+
 });
 
 router.post('/auth', async function(req, res, next) {
@@ -50,30 +72,18 @@ router.post('/auth', async function(req, res, next) {
   }
 });
 
-router.post('/addUser', async function(req, res, next) {
-  const usedEmail = await UserModel.find({}, { 'email': 1, '_id': 0 });
-  if (!contains(usedEmail, "email", req.body.email)) {
-    const newuser = new UserModel(req.body);
-    try {
-      const result = await newuser.save();
-      res.json({ "status": "added", "obj": result });
-    } catch (error) {
-      res.status(500).json({ error: 'An error occurred while adding user' });
-    }
-  } else {
-    res.json({ "error": 'this email is taken' });
-  }
-});
 
-router.put('/edit/:id', async function(req, res, next) {
+router.put('/edit/:id', async function (req, res, next) {
   try {
     const result = await UserModel.findByIdAndUpdate({ _id: req.params.id }, {
       $set: req.body
     }, { new: true });
-    res.send({ "status": "edited", "object": result });
+
+    res.send({ "status": "edited", "object": result })
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred while editing user' });
+    res.send(error)
   }
-});
+})
+
 
 module.exports = router;

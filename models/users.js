@@ -24,7 +24,10 @@ const UserSchema = new mongoose.Schema({
     phonenumber:{
         type:String,
         required:true
-    },
+    },role:{
+        type:String,
+        default:"normal user"
+    }
 },{timestamps:true})
 
 
