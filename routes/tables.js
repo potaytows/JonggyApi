@@ -62,7 +62,7 @@ router.delete('/delete/:id', async function (req, res, next) {
 
 router.put('/edit/:id', async function (req, res, next) {
     try{
-    const result = await TableModel.findByIdAndUpdate({ _id: req.params.id },{
+    const result = await TableModel.findByIdAndUpdate({ _id: req.params.id },{  
         $set:req.body
     },{new:true});
     res.send({ "status": "edited", "object": result })

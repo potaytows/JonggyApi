@@ -22,15 +22,15 @@ router.get('/getusers', async function (req, res, next) {
 
 });
 
-router.get('/auth', async function (req, res, next) {
+router.post('/auth', async function (req, res, next) {
   try {
-    const result = await UserModel.findOne({ 'email': req.body.email, 'password': req.body.password }, { 'password': 0 })
+    const result = await UserModel.findOne({ 'username': req.body.username, 'password': req.body.password }, { 'password': 0 })
     if (result) {
       res.json({ "status": "auth success", "obj": result })
 
     } else {
       res.json({ "status": "auth failed" })
-    }
+    } 
 
   } catch (error) {
     res.send(error)

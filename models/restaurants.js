@@ -10,6 +10,9 @@ const RestaurantSchema = new mongoose.Schema({
         type:String,default:"Looks like this restaurant hasn't put any description yet..."
     },owner:{
         type:mongoose.Types.ObjectId, ref: "User"
+    },status:{
+        type:String,
+        default:'closed'
     }
     
 
