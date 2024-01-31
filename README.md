@@ -8,3 +8,7 @@ This is an expressJS API for Jongy Application
 - [@Potaytows(Chi)](https://github.com/potaytows)
 - [@Ntpply(Niti)](https://github.com/Ntpply)
 
+## Related Repositories
+[JongyAdminSide](https://github.com/potaytows/JongyAdminSide)
+
+
