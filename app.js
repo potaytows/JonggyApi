@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose')
+var imageRouter = require('./routes/image');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -24,10 +25,12 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/tables',tablesRouter);
 app.use('/restaurants',restaurantsRouter);
+app.use('/image',imageRouter);
+
 
 const uri2 = "mongodb://127.0.0.1:27017/dragdrop";
 const uri = "mongodb+srv://finalProject:EFpeUnSek3qtwsMf@cluster0.xoovbhu.mongodb.net/finalProject?retryWrites=true&w=majority" 
-mongoose.connect(uri)
+mongoose.connect(uri2)
 .then((result)=> app.listen(8000, () => {
   console.log('API is running on ports 8000 http://localhost:8000/');
 }))

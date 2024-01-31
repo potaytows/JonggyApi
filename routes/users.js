@@ -15,7 +15,6 @@ router.get('/getusers', async function (req, res, next) {
   try {
     const result = await UserModel.find({role:"normal user"}, { 'password': 0 })
     res.json(result)
-
   } catch (error) {
     res.send(error)
   }
@@ -24,7 +23,17 @@ router.get('/getusers', async function (req, res, next) {
 
 router.get('/getusers/:id', async function (req, res, next) {
   try {
-    const result = await UserModel.findOne({role:"normal user",username:req.params.id}, { 'password': 0 })
+    const result = await UserModel.findOne({role:"normal user",username:req.params.id}, { 'password': 0 }).limit(50)
+    res.json(result)
+
+  } catch (error) {
+    res.send(error)
+  }
+
+});
+router.get('/getlikeUsers/:id', async function (req, res, next) {
+  try {
+    const result = await UserModel.find({role:"normal user",username:{ $regex: '.*' + req.params.id + '.*' }}, { 'password': 0 }).limit(50)
     res.json(result)
 
   } catch (error) {
