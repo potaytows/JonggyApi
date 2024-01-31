@@ -1,12 +1,25 @@
 var express = require('express');
 var router = express.Router();
+var fs = require('fs');
+var path = require('path');
 var UserModel = require('../models/users')
 var RestaurantModel = require('../models/restaurants');
+var multer = require('multer');
+var storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+      cb(null, 'uploads/')
+  },
+  filename: (req, file, cb) => {
+      cb(null,file.fieldname + '-' + Date.now())
+  }
+});
+var upload = multer({storage:storage});
 
-/* GET home page. */
+
 router.get('/', async function (req, res, next) {
     try {
-        const restaurants = await RestaurantModel.find();
+        const restaurants = await RestaurantModel.find({},{restaurantIcon:0});
+        
         res.json(restaurants)
 
     } catch (error) {
@@ -27,7 +40,7 @@ router.get('/:id', async function (req, res, next) {
 
 
 });
-router.get('/getByUsername/:id', async function (req, res, next) {
+router.get('/getByUsername/:id',async function (req, res, next) {
     try {
         const restaurants = await RestaurantModel.findOne({owner:req.params.id});
         res.json(restaurants)
@@ -41,19 +54,38 @@ router.get('/getByUsername/:id', async function (req, res, next) {
 
 
 
-router.post('/addRestaurant', async function (req, res, next) {
-    try {
-        const newRestaurant = new RestaurantModel(req.body)
-        const result = await newRestaurant.save();
+router.post('/addRestaurant',upload.single('image'), async function (req, res, next) {
+    console.log(req.file)
+    console.log(req.body)
 
-        res.send({ "status": "added", "object": result })
-    } catch (error) {
+    try{
+        const newRestaurant = await RestaurantModel.create({
+            restaurantName: req.body.restaurantName,
+            restaurantIcon: {
+              data: fs.readFileSync(path.join(__dirname + "/../uploads/" + req.file.filename)),
+              contentType: 'image/png'
+            }
+        
+          })
+
+          newRestaurant.save();
+          res.send({"status":"added succesfully"})
+    }catch(error){
         res.send(error)
+    }finally{
+        
     }
 
 });
 router.delete('/delete/:id', async function (req, res, next) {
     try {
+        const restaurant = await RestaurantModel.findOne({_id:req.params.id});
+        if(restaurant.owner!=""){
+            const owner = await UserModel.findOneAndUpdate({ username:restaurant.owner }, {
+                $set: {role:"normal user"}
+              }, { new: true });
+
+        }
         const result = await RestaurantModel.findOneAndDelete({_id:req.params.id});
         res.send({ "status": "deleted", "object": result })
 
@@ -101,4 +133,14 @@ router.put('/edit/:id', async function (req, res, next) {
         res.send(error)
     }
 });
+router.get('/getlikeRestaurants/:id', async function (req, res, next) {
+    try {
+      const result = await RestaurantModel.find({restaurantName:{ $regex: '.*' + req.params.id + '.*' }}).limit(50)
+      res.json(result)
+  
+    } catch (error) {
+      res.send(error)
+    }
+  
+  });
 module.exports = router;
