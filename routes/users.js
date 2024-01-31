@@ -1,14 +1,15 @@
-var express = require('express');
-var router = express.Router();
-var UserModel = require('../models/users')
-/* GET users listing. */
+const express = require('express');
+const router = express.Router();
+const UserModel = require('../models/users');
 
 function contains(arr, key, val) {
+
   for (var i = 0; i < arr.length; i++) {
     if (arr[i][key] === val) return true;
   }
   return false;
 }
+
 
 router.get('/getusers', async function (req, res, next) {
   try {
@@ -115,16 +116,32 @@ router.post('/addUser', async function (req, res, next) {
 
 });
 
+router.post('/auth', async function(req, res, next) {
+  const { email, password } = req.body;
+  try {
+    const result = await UserModel.findOne({ 'email': email, 'password': password }, { 'password': 0 });
+    if (result) {
+      res.json({ "status": "auth success", "obj": result });
+    } else {
+      res.json({ "status": "auth failed" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred during authentication' });
+  }
+});
+
 
 router.put('/edit/:id', async function (req, res, next) {
   try {
     const result = await UserModel.findByIdAndUpdate({ _id: req.params.id }, {
       $set: req.body
     }, { new: true });
+
     res.send({ "status": "edited", "object": result })
   } catch (error) {
     res.send(error)
   }
 })
+
 
 module.exports = router;
