@@ -13,6 +13,9 @@ const RestaurantSchema = new mongoose.Schema({
     },status:{
         type:String,
         default:'closed'
+    },restaurantIcon:{
+        data:Buffer,
+        contentType:String
     }
     
 
