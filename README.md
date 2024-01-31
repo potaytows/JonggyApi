@@ -9,8 +9,8 @@ This is an expressJS API for Jongy Application
 - [@Ntpply(Niti)](https://github.com/Ntpply)
 
 ## Related Repositories
--[JongyAdminSide](https://github.com/potaytows/JongyAdminSide)
--[JongyOwnerSide](https://github.com/potaytows/JongyOwnerSide)
--[JongyClientSide](https://github.com/Ntpply/jongyClientside)
+- [JongyAdminSide](https://github.com/potaytows/JongyAdminSide)
+- [JongyOwnerSide](https://github.com/potaytows/JongyOwnerSide)
+- [JongyClientSide](https://github.com/Ntpply/jongyClientside)
 
 
