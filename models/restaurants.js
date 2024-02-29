@@ -9,10 +9,13 @@ const RestaurantSchema = new mongoose.Schema({
     description:{
         type:String,default:"หลังมอ"
     },owner:{
-        type:mongoose.Types.ObjectId, ref: "User"
+        type:String
     },status:{
         type:String,
         default:'closed'
+    },restaurantIcon:{
+        data:Buffer,
+        contentType:String
     }
     
 
