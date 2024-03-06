@@ -18,6 +18,9 @@ const MenuSchema = new mongoose.Schema({
     },menu_icon:{
         data:Buffer,
         contentType:String
+    },additionalInfo: {
+        type: AdditionalInfoSchema,
+        default: {} 
     }
     
 
