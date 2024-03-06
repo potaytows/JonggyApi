@@ -49,8 +49,6 @@ router.get('/getByUsername/:id', async function (req, res, next) {
     } catch (error) {
         res.send(error)
     }
-
-
 });
 
 
