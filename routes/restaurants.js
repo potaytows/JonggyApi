@@ -40,6 +40,7 @@ router.get('/:id', async function (req, res, next) {
 
 
 });
+
 router.get('/getByUsername/:id', async function (req, res, next) {
     try {
         const restaurants = await RestaurantModel.findOne({ owner: req.params.id });
@@ -48,8 +49,6 @@ router.get('/getByUsername/:id', async function (req, res, next) {
     } catch (error) {
         res.send(error)
     }
-
-
 });
 
 
@@ -57,12 +56,17 @@ router.get('/getByUsername/:id', async function (req, res, next) {
 router.post('/addRestaurant', upload.single('image'), async function (req, res, next) {
     console.log(req.file)
     console.log(req.body)
-    if (req.file) {
+    if(req.file){
+        filename = "/../uploads/"+req.file.filename
+    }else{
+        filename= "/../assets/default-restaurant"
+
+    }
         try {
             const newRestaurant = await RestaurantModel.create({
                 restaurantName: req.body.restaurantName,
                 restaurantIcon: {
-                    data: fs.readFileSync(path.join(__dirname + "/../uploads/" + req.file.filename)),
+                    data: fs.readFileSync(path.join(__dirname + filename)),
                     contentType: 'image/png'
                 }
 
@@ -74,30 +78,14 @@ router.post('/addRestaurant', upload.single('image'), async function (req, res, 
             res.status(400).send(error)
             console.log(error)
         } finally {
-            fs.unlinkSync(path.join(__dirname + "/../uploads/" + req.file.filename))
+            if(req.file){
+                fs.unlinkSync(path.join(__dirname + "/../uploads/" + req.file.filename))
+            }
+            
 
         }
 
 
-    } else {
-        try {
-            const newRestaurant = await RestaurantModel.create({
-                restaurantName: req.body.restaurantName,
-                restaurantIcon: {
-                    data: fs.readFileSync(path.join(__dirname + "/../assets/default-restaurant")),
-                    contentType: 'image/png'
-                }
-
-            })
-
-            newRestaurant.save();
-            res.send({ "status": "added succesfully" })
-        } catch (error) {
-            res.status(400).send(error)
-            console.log(error)
-        }
-
-    }
 
 
 });
@@ -164,6 +152,7 @@ router.get('/getlikeRestaurants/:id', async function (req, res, next) {
 
     } catch (error) {
         res.send(error)
+        console.log(error)
     }
 
 });
