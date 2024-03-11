@@ -7,7 +7,8 @@ const RestaurantSchema = new mongoose.Schema({
         required:true
     },
     description:{
-        type:String,default:"หลังมอ"
+        type:String,
+        default:"This restaurant hasn't put any description yet"
     },owner:{
         type:String
     },status:{

@@ -11,6 +11,6 @@ This is an expressJS API for Jongy Application
 ## Related Repositories
 - [JongyAdminSide](https://github.com/potaytows/JongyAdminSide)
 - [JongyOwnerSide](https://github.com/potaytows/JongyOwnerSide)
-- [JongyClientSide](https://github.com/Ntpply/jongyClientside)
+- [JongyClientSide](https://github.com/potaytows/jongyClientside)
 
 
