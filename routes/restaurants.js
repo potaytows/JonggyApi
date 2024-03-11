@@ -10,10 +10,11 @@ var storage = multer.diskStorage({
         cb(null, 'uploads/')
     },
     filename: (req, file, cb) => {
-        cb(null, file.fieldname + '-' + Date.now())
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        cb(null, '-' + uniqueSuffix)
     }
 });
-var upload = multer({ storage: storage });
+var upload = multer({ storage: storage, limits: 1024 * 1024 * 5 });
 
 
 router.get('/', async function (req, res, next) {
@@ -53,42 +54,65 @@ router.get('/getByUsername/:id', async function (req, res, next) {
 
 
 
-router.post('/addRestaurant', upload.single('image'), async function (req, res, next) {
+router.post('/uploadImage/:id', upload.single('image'), async function (req, res, next) {
     console.log(req.file)
-    console.log(req.body)
-    if(req.file){
-        filename = "/../uploads/"+req.file.filename
-    }else{
-        filename= "/../assets/default-restaurant"
-
+    if (req.file) {
+        filename = "/../uploads/" + req.file.filename
     }
-        try {
-            const newRestaurant = await RestaurantModel.create({
-                restaurantName: req.body.restaurantName,
-                restaurantIcon: {
-                    data: fs.readFileSync(path.join(__dirname + filename)),
-                    contentType: 'image/png'
-                }
-
-            })
-
+    try {
+        const newRestaurant = await RestaurantModel.findOne({
+            '_id': req.params.id
+        })
+        newRestaurant.restaurantIcon = {
+            data: fs.readFileSync(path.join(__dirname + filename)),
+            contentType: 'image/png'
+        },
             newRestaurant.save();
-            res.send({ "status": "added succesfully" })
-        } catch (error) {
-            res.status(400).send(error)
-            console.log(error)
-        } finally {
-            if(req.file){
-                fs.unlinkSync(path.join(__dirname + "/../uploads/" + req.file.filename))
-            }
-            
-
+        res.send({ "status": "uploaded succesfully" })
+    } catch (error) {
+        res.status(400).send(error)
+        console.log(error)
+    } finally {
+        if (req.file) {
+            fs.unlinkSync(path.join(__dirname + "/../uploads/" + req.file.filename))
         }
-
-
-
-
+    }
 });
+
+router.post('/uploadImage/:id/default', async function (req, res, next) {
+    filename = "/../assets/default-restaurant"
+    try {
+        const newRestaurant = await RestaurantModel.findOne({
+            '_id': req.params.id
+        })
+        newRestaurant.restaurantIcon = {
+            data: fs.readFileSync(path.join(__dirname + filename)),
+            contentType: 'image/png'
+        },
+            newRestaurant.save();
+        res.send({ "status": "uploaded succesfully" })
+    } catch (error) {
+        res.status(400).send(error)
+        console.log(error)
+    } 
+});
+
+router.post('/addRestaurant', upload.single('image'), async function (req, res, next) {
+    try {
+        const newRestaurant = await RestaurantModel.create({
+            restaurantName: req.body.restaurantName,
+            description: req.body.description
+
+        })
+
+        const result = await newRestaurant.save();
+        res.send({ "status": "added succesfully", obj: result })
+    } catch (error) {
+        res.status(400).send(error)
+        console.log(error)
+    }
+});
+
 router.delete('/delete/:id', async function (req, res, next) {
     try {
         const restaurant = await RestaurantModel.findOne({ _id: req.params.id });

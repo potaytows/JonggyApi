@@ -92,13 +92,21 @@ router.post('/Auth/admin', async function (req, res, next) {
 
 router.post('/Auth/owner', async function (req, res, next) {
   try {
-    const result = await UserModel.findOne({ 'username': req.body.username, 'password': req.body.password, role: "owner" }, { 'password': 0 })
-    if (result) {
-      res.json({ "status": "auth success", "obj": result })
-
-    } else {
+    const result = await UserModel.findOne({ 'username_lower': req.body.username, role: "owner" })
+    if(result){
+      result.comparePassword(req.body.password, function (err, isMatch) {
+        if (err) throw err;
+        if (isMatch) {
+          res.json({ "status": "auth success", "obj": result })
+  
+        } else {
+          res.json({ "status": "auth failed" })
+        }
+      });
+    }else{
       res.json({ "status": "auth failed" })
     }
+    
 
   } catch (error) {
     res.send(error)
@@ -131,20 +139,6 @@ router.post('/addUser', async function (req, res, next) {
     res.send(error)
   }
 
-});
-
-router.post('/auth', async function (req, res, next) {
-  const { email, password } = req.body;
-  try {
-    const result = await UserModel.findOne({ 'email': email, 'password': password }, { 'password': 0 });
-    if (result) {
-      res.json({ "status": "auth success", "obj": result });
-    } else {
-      res.json({ "status": "auth failed" });
-    }
-  } catch (error) {
-    res.status(500).json({ error: 'An error occurred during authentication' });
-  }
 });
 
 

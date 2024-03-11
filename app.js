@@ -5,7 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose')
 var imageRouter = require('./routes/image');
-
+var bodyParser = require('body-parser')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var tablesRouter = require('./routes/tables');
@@ -14,7 +14,8 @@ var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -26,6 +27,7 @@ app.use('/users', usersRouter);
 app.use('/tables',tablesRouter);
 app.use('/restaurants',restaurantsRouter);
 app.use('/image',imageRouter);
+
 
 
 const uri2 = "mongodb://127.0.0.1:27017/dragdrop";
