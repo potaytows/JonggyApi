@@ -94,19 +94,29 @@ router.post('/uploadImage/:id/default', async function (req, res, next) {
     } catch (error) {
         res.status(400).send(error)
         console.log(error)
-    } 
+    }
 });
 
-router.post('/addRestaurant', upload.single('image'), async function (req, res, next) {
+router.post('/addRestaurant', async function (req, res, next) {
     try {
-        const newRestaurant = await RestaurantModel.create({
-            restaurantName: req.body.restaurantName,
-            description: req.body.description
+        if (req.body.description != "") {
+            const newRestaurant = await RestaurantModel.create({
+                restaurantName: req.body.restaurantName,
+                description: req.body.description
+            })
 
-        })
+            const result = await newRestaurant.save();
+            res.send({ "status": "added succesfully", obj: result })
 
-        const result = await newRestaurant.save();
-        res.send({ "status": "added succesfully", obj: result })
+        } else {
+            const newRestaurant = await RestaurantModel.create({
+                restaurantName: req.body.restaurantName,
+            })
+
+            const result = await newRestaurant.save();
+            res.send({ "status": "added succesfully", obj: result })
+        }
+
     } catch (error) {
         res.status(400).send(error)
         console.log(error)
