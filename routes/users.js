@@ -51,16 +51,23 @@ router.get('/getlikeUsers/:id', async function (req, res, next) {
 router.post('/auth', async function (req, res, next) {
   try {
     const result = await UserModel.findOne({ 'username': req.body.username })
-    result.comparePassword(req.body.password, function (err, isMatch) {
-      console.log(isMatch)
-      if (err) throw err;
-      if (isMatch) {
-        res.json({ "status": "auth success", "obj": result })
+    if(result){
+      result.comparePassword(req.body.password, function (err, isMatch) {
+        console.log(isMatch)
+        if (err) throw err;
+        if (isMatch) {
+          res.json({ "status": "auth success", "obj": result })
+  
+        } else {
+          res.json({ "status": "auth failed" })
+        }
+      });
 
-      } else {
-        res.json({ "status": "auth failed" })
-      }
-    });
+    }else{
+      res.json({ "status": "auth failed" })
+      
+    }
+    
 
 
   } catch (error) {
@@ -97,13 +104,21 @@ router.post('/Auth/admin', async function (req, res, next) {
 
 router.post('/Auth/owner', async function (req, res, next) {
   try {
-    const result = await UserModel.findOne({ 'username': req.body.username, 'password': req.body.password, role: "owner" }, { 'password': 0 })
-    if (result) {
-      res.json({ "status": "auth success", "obj": result })
-
-    } else {
+    const result = await UserModel.findOne({ 'username_lower': req.body.username.toLowerCase(), role: "owner" })
+    if(result){
+      result.comparePassword(req.body.password, function (err, isMatch) {
+        if (err) throw err;
+        if (isMatch) {
+          res.json({ "status": "auth success", "obj": result })
+  
+        } else {
+          res.json({ "status": "auth failed" })
+        }
+      });
+    }else{
       res.json({ "status": "auth failed" })
     }
+    
 
   } catch (error) {
     res.send(error)
@@ -137,8 +152,6 @@ router.post('/addUser', async function (req, res, next) {
   }
 
 });
-
-
 
 router.put('/edit/:id', async function (req, res, next) {
   console.log(req.body)
@@ -246,6 +259,7 @@ async function deleteOTP(email) {
     throw error;
   }
 }
+
 
 router.post('/resetPassword/:email', async (req, res) => {
   try {
