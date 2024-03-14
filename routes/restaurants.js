@@ -44,7 +44,7 @@ router.get('/:id', async function (req, res, next) {
 
 router.get('/getByUsername/:id', async function (req, res, next) {
     try {
-        const restaurants = await RestaurantModel.findOne({ owner: req.params.id });
+        const restaurants = await RestaurantModel.findOne({ owner: req.params.id },{restaurantIcon:0});
         res.json(restaurants)
 
     } catch (error) {

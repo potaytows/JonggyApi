@@ -9,6 +9,8 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var tablesRouter = require('./routes/tables');
 var menusRouter = require('./routes/menu');
+var addonRouter = require('./routes/addon');
+
 
 var restaurantsRouter = require('./routes/restaurants');
 var app = express();
@@ -31,6 +33,8 @@ app.use('/tables',tablesRouter);
 app.use('/restaurants',restaurantsRouter);
 app.use('/image',imageRouter);
 app.use('/menus',menusRouter);
+app.use('/addons',addonRouter);
+
 
 
 
