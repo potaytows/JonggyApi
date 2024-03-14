@@ -17,10 +17,10 @@ const TableSchema = new mongoose.Schema({
     restaurant_id:{
         type:mongoose.Types.ObjectId, ref: "Restaurant",
         required:true
+    },status:{
+        type:String,
+        default:"not available"
     }
-
-    
-
 },{timestamps:true})
 
 

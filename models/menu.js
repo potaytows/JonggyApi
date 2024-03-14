@@ -19,7 +19,6 @@ const MenuSchema = new mongoose.Schema({
         data:Buffer,
         contentType:String
     }
-    // ,toppings:[]
     
 
 },{timestamps:true})
