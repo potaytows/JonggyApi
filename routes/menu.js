@@ -18,14 +18,34 @@ var upload = multer({ storage: storage, limits: 1024 * 1024 * 5 });
 router.get('/getMenus/:id', async function (req, res, next) {
     try{
     const id = req.params.id
-    // const restaurant = await RestaurantModel.findOne({_id})
-    const menu = await MenuModel.find({restaurant_id:id});
+    // const restaurant = await RestaurantModel.findOne({owner:id})
+    const menu = await MenuModel.find({restaurant_id:id},{menu_icon:0});
+    res.json(menu)
+    }catch(error){
+        res.send(error)
+    }
+});
+router.get('/getMenu/:id', async function (req, res, next) {
+    try{
+    const id = req.params.id
+    // const restaurant = await RestaurantModel.findOne({owner:id})
+    const menu = await MenuModel.findOne({_id:id},{menu_icon:0});
     res.json(menu)
     }catch(error){
         res.send(error)
     }
 });
 
+router.get('/getMenusByUsername/:id', async function (req, res, next) {
+    try{
+    const id = req.params.id
+    const restaurant = await RestaurantModel.findOne({owner:id})
+    const menu = await MenuModel.find({restaurant_id:restaurant._id},{menu_icon:0});
+    res.json(menu)
+    }catch(error){
+        res.send(error)
+    }
+});
 router.post('/uploadImage/:id', upload.single('image'), async function (req, res, next) {
     console.log(req.file)
     if (req.file) {
@@ -91,4 +111,15 @@ router.post('/addMenu/:id', async function (req, res, next) {
 
 });
 
+router.put('/edit/:id', async function (req, res, next) {
+    try{
+    const result = await MenuModel.findByIdAndUpdate({ _id: req.params.id },{  
+        $set:req.body
+    },{new:true});
+    res.send({ "status": "edited", "object": result })  
+    console.log(result)
+    }catch(error){
+        res.send(error)
+    }
+});
 module.exports = router;
