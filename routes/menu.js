@@ -18,8 +18,8 @@ var upload = multer({ storage: storage, limits: 1024 * 1024 * 5 });
 router.get('/getMenus/:id', async function (req, res, next) {
     try{
     const id = req.params.id
-    const restaurant = await RestaurantModel.findOne({owner:id})
-    const menu = await MenuModel.find({restaurant_id:restaurant._id});
+    // const restaurant = await RestaurantModel.findOne({_id})
+    const menu = await MenuModel.find({restaurant_id:id});
     res.json(menu)
     }catch(error){
         res.send(error)
