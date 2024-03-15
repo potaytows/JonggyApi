@@ -4,6 +4,8 @@ var MenuModel = require('../models/menu');
 const RestaurantModel = require('../models/restaurants');
 var fs = require('fs');
 var path = require('path');
+const addonModel = require('../models/addons');
+
 var multer = require('multer');
 var storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -72,7 +74,7 @@ router.post('/uploadImage/:id', upload.single('image'), async function (req, res
 });
 
 router.post('/uploadImage/:id/default', async function (req, res, next) {
-    filename = "/../assets/default-restaurant"
+    filename = "/../assets/default-menu"
     try {
         const newMenu = await MenuModel.findOne({
             '_id': req.params.id
@@ -117,6 +119,19 @@ router.put('/edit/:id', async function (req, res, next) {
         $set:req.body
     },{new:true});
     res.send({ "status": "edited", "object": result })  
+    console.log(result)
+    }catch(error){
+        res.send(error)
+    }
+});
+
+router.delete('/delete/:id', async function (req, res, next) {
+    try{
+    const addons = await addonModel.deleteMany({menu_id:req.params.id});
+    const result = await MenuModel.findOneAndDelete({ _id: req.params.id },{  
+        $set:req.body
+    },{new:true});
+    res.send({ "status": "deleted", "object": result })  
     console.log(result)
     }catch(error){
         res.send(error)
