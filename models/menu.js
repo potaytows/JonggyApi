@@ -15,7 +15,7 @@ const MenuSchema = new mongoose.Schema({
     },status:{
         type:String,
         default:'not available'
-    },menu_icon:{
+    },menu_icon:{   
         data:Buffer,
         contentType:String
     }

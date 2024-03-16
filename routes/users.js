@@ -187,7 +187,7 @@ router.post('/forgotPassword', async (req, res, next) => {
     console.log(user);
 
     if (!user) {
-      res.status(404).json({ status: 'ไม่มีอีเมลดังกล่าว' });
+      res.json({ status: 'ไม่มีอีเมลดังกล่าว' });
       return;
     }
 
@@ -234,12 +234,12 @@ router.post('/verify-otp', async (req, res) => {
     const user = await UserModel.findOne({ email, otp });
 
     if (!user) {
-      res.status(400).json({ status: 'invalid OTP or email' });
+      res.json({ status: 'invalid OTP or email' });
       return;
     }
 
     if (new Date() > user.expires) {
-      res.status(400).json({ status: 'expired OTP' });
+      res.json({ status: 'expired OTP' });
       // เรียกฟังก์ชันลบ OTP
       await deleteOTP(user.email);
       return;
@@ -276,7 +276,7 @@ router.post('/resetPassword/:email', async (req, res) => {
     }
 
     user.password = newPassword;
-    user.otp = undefined;
+    user.email = undefined;
     user.expiresAt = undefined;
 
     await user.save();
