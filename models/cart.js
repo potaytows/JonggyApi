@@ -1,9 +1,6 @@
 const mongoose = require('mongoose');
 
 const CartSchema = new mongoose.Schema({
-    username:{
-        type: String
-    },
     restaurantId: {
         type: mongoose.Types.ObjectId, ref: "Restaurant",
         required: true
@@ -31,11 +28,11 @@ const CartSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    forTable:{
-        type: String,
-        required: true
-
+    totalPrice: {
+        type: Number,
+        default: 0
     }
+
 });
 
 const CartModel = mongoose.model('Cart', CartSchema);
