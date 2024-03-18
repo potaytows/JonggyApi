@@ -25,7 +25,7 @@ router.post('/reserveTables', async function (req, res, next) {
 
 router.get('/getReservationByRestaurantID/:id', async function (req, res, next) {
     try {
-        const result = await ReservationModel.find({ restaurant_id: req.params.id }).populate("reservedTables").populate("orderedFood.selectedTables").populate("orderedFood.selectedMenuItem","-menu_icon").populate("orderedFood.selectedAddons")
+        const result = await ReservationModel.find({ restaurant_id: req.params.id }).populate("reservedTables").populate("orderedFood.selectedTables","-x -y").populate("orderedFood.selectedMenuItem","-menu_icon").populate("orderedFood.selectedAddons").populate("restaurant_id","-restaurantIcon").sort({ createdAt: 1 })
         res.json(result)
     } catch (error) {
         res.send(error)
