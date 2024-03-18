@@ -11,6 +11,8 @@ var tablesRouter = require('./routes/tables');
 var menusRouter = require('./routes/menu');
 var addonRouter = require('./routes/addon');
 var cartRouter = require('./routes/cart');
+var reserveRouter = require('./routes/reservation');
+
 
 
 var restaurantsRouter = require('./routes/restaurants');
@@ -36,6 +38,8 @@ app.use('/image',imageRouter);
 app.use('/menus',menusRouter);
 app.use('/addons',addonRouter);
 app.use('/cart',cartRouter);
+app.use('/reservation',reserveRouter);
+
 
 
 

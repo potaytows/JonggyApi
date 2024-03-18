@@ -27,7 +27,7 @@ router.get('/getbyRestaurantId/:id', async function (req, res, next) {
     try{
     const id = req.params.id
     console.log(id)
-    const tables = await TableModel.find({restaurant_id:id});
+    const tables = await TableModel.find({restaurant_id:id},{updatedAt:0,createdAt:0});
     res.json(tables)
     }catch(error){
         res.send(error)
