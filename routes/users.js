@@ -50,7 +50,7 @@ router.get('/getlikeUsers/:id', async function (req, res, next) {
 
 router.post('/auth', async function (req, res, next) {
   try {
-    const result = await UserModel.findOne({ 'username': req.body.username })
+    const result = await UserModel.findOne({ 'username_lower': req.body.username.toLowerCase() })
     if(result){
       result.comparePassword(req.body.password, function (err, isMatch) {
         console.log(isMatch)
@@ -132,7 +132,7 @@ router.post('/addUser', async function (req, res, next) {
   console.log(req.body)
   try {
     const usedEmail = await UserModel.find({}, { 'email': 1, '_id': 0 })
-    const usedUsername = await UserModel.find({}, { 'username': 1, '_id': 0 })
+    const usedUsername = await UserModel.findAll({}, { 'username_lower': 1, '_id': 0 })
     const lowerUsername = req.body.username.toLowerCase()
     if (!contains(usedEmail, "email", req.body.email) && !contains(usedUsername, "username_lower", lowerUsername)) {
       const newuser = new UserModel(req.body);

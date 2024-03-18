@@ -15,7 +15,7 @@ const CartSchema = new mongoose.Schema({
         _id: String,
         menuName: String,
         price: Number,
-        Count: Number
+
     },
     selectedAddons: [
         {
@@ -31,12 +31,13 @@ const CartSchema = new mongoose.Schema({
     totalPrice: {
         type: Number,
         default: 0
+    },username:{
+        type: String
+
+    },Count:{
+        type:Number
     }
 
 });
 
-const CartModel = mongoose.model('Cart', CartSchema);
-
-
-
-module.exports = CartModel;
+module.exports = mongoose.model('Cart', CartSchema);
