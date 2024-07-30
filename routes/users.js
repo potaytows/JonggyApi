@@ -132,7 +132,7 @@ router.post('/addUser', async function (req, res, next) {
   console.log(req.body)
   try {
     const usedEmail = await UserModel.find({}, { 'email': 1, '_id': 0 })
-    const usedUsername = await UserModel.findAll({}, { 'username_lower': 1, '_id': 0 })
+    const usedUsername = await UserModel.find({}, { 'username_lower': 1, '_id': 0 })
     const lowerUsername = req.body.username.toLowerCase()
     if (!contains(usedEmail, "email", req.body.email) && !contains(usedUsername, "username_lower", lowerUsername)) {
       const newuser = new UserModel(req.body);
@@ -276,7 +276,7 @@ router.post('/resetPassword/:email', async (req, res) => {
     }
 
     user.password = newPassword;
-    user.email = undefined;
+    user.otp = undefined;
     user.expiresAt = undefined;
 
     await user.save();

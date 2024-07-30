@@ -1,6 +1,7 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
+var cors = require('cors')
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose')
@@ -21,8 +22,9 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+app.use(cors())
 app.use(logger('dev'));
-app.use(express.json());
+app.use(express.json());  
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -50,8 +52,8 @@ app.use('/reservation',reserveRouter);
 const uri2 = "mongodb://127.0.0.1:27017/dragdrop";
 const uri = "mongodb+srv://finalProject:EFpeUnSek3qtwsMf@cluster0.xoovbhu.mongodb.net/finalProject?retryWrites=true&w=majority" 
 mongoose.connect(uri)
-.then((result)=> app.listen(8000, () => {
-  console.log('API is running on ports 8000 http://localhost:8000/');
+.then((result)=> app.listen(8080, () => {
+  console.log('API is running on ports 8000 http://localhost:8080/');
 }))
     .catch((err) => console.log(err))
 app.use(function(req, res, next) {
