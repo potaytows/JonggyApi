@@ -39,11 +39,10 @@ router.post('/addTable', async function (req, res, next) {
 
     try {
         const newTable = new TableModel(req.body)
+        console.log(newTable)
         const result = await newTable.save();
-        res.send({ "status": "added", "object": result })
-
-
-
+        res.send({ "status": "added", "object": result });
+        console.log(result);
     } catch (error) {
         res.send(error)
     }
@@ -66,7 +65,6 @@ router.put('/edit/:id', async function (req, res, next) {
         $set:req.body
     },{new:true});
     res.send({ "status": "edited", "object": result })
-    console.log(result)
     }catch(error){
         res.send(error)
     }

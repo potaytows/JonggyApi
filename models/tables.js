@@ -2,9 +2,8 @@ const mongoose = require('mongoose');
 
 
 const TableSchema = new mongoose.Schema({
-    tableName: {
+    text: {
         type: String,
-        required: true
     },
     x: {
         type: Number,
@@ -21,6 +20,19 @@ const TableSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    type:{
+        type:String,
+        default:""
+    },height:{
+        type:Number,
+    },width:{
+        type:Number,
+    },shapeType:{
+        type:String,
+    },color:{
+        type:String,
+        default:'#ff8a24'
+    }
 }, { timestamps: true })
 
 
@@ -29,4 +41,3 @@ const TableSchema = new mongoose.Schema({
 
 
 module.exports = mongoose.model('Table', TableSchema)
-

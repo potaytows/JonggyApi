@@ -20,14 +20,10 @@ var upload = multer({ storage: storage, limits: 1024 * 1024 * 5 });
 router.get('/', async function (req, res, next) {
     try {
         const restaurants = await RestaurantModel.find({}, { restaurantIcon: 0 });
-
         res.json(restaurants)
-
     } catch (error) {
         res.send(error)
     }
-
-
 });
 
 router.get('/:id', async function (req, res, next) {
@@ -166,7 +162,7 @@ router.put('/edit/:id', async function (req, res, next) {
                 $set: req.body
             }, { new: true });
 
-            const usereresult = await UserModel.findOneAndUpdate({ username: req.body.owner }, {
+            const usereresult = await UserModel.findOneAndUpdate({ username: req.body.owner,}, {
                 $set: { role: "owner" }
             }, { new: true });
             console.log(result)
