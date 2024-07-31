@@ -53,7 +53,7 @@ router.post('/auth', async function (req, res, next) {
     const result = await UserModel.findOne({ 'username_lower': req.body.username.toLowerCase() })
     if(result){
       result.comparePassword(req.body.password, function (err, isMatch) {
-        console.log(isMatch)
+        
         if (err) throw err;
         if (isMatch) {
           res.json({ "status": "auth success", "obj": result })
