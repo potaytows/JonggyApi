@@ -17,7 +17,7 @@ var cartRouter = require('./routes/cart');
 var reserveRouter = require('./routes/reservation');
 var chatRoutes = require('./routes/chat');
 var restaurantsRouter = require('./routes/restaurants');
-const Chat = require('./models/chat'); 
+const Chat = require('./models/chat');
 var app = express();
 
 var server = http.createServer(app);
@@ -67,22 +67,22 @@ io.on('connection', (socket) => {
         try {
             let chat = await Chat.findOne({ reservation: data.reservationID });
             if (!chat) {
-                
                 console.error('Chat not found');
                 return;
             }
 
             const newMessage = { sender: data.sender, message: data.message, timestamp: new Date() };
             chat.messages.push(newMessage);
-            await chat.save(); 
+            await chat.save();
 
             io.to(data.reservationID).emit('message', newMessage);
 
-            socket.broadcast.to(data.reservationID).emit('notification', {
-            sender: data.sender,
-            message: 'You have a new message',
-            timestamp: newMessage.timestamp
-        });
+            socket.broadcast.emit('notification', {
+                sender: data.sender,
+                message: data.message,
+                reservationID: data.reservationID,
+            });
+
         } catch (error) {
             console.error('Error saving message to database:', error);
         }
@@ -103,12 +103,12 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
     .catch((err) => console.log(err));
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
