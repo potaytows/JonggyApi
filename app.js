@@ -53,43 +53,94 @@ app.use('/reservation', reserveRouter);
 app.use('/chat', chatRoutes);
 
 app.set('socketio', io);
+const connectedUsers = {};
 
 io.on('connection', (socket) => {
     console.log('New client connected');
 
-    socket.on('joinRoom', (roomId) => {
+    socket.on('joinRoom', async (roomId, userType) => {
         socket.join(roomId);
         console.log('Joined room:', roomId);
-    });
+        console.log('user Joined room:', userType);
 
-    socket.on('chatMessage', async (data) => {
-        console.log('Received chatMessage:', data);
+
+        connectedUsers[socket.id] = { roomId, userType };
+
         try {
-            let chat = await Chat.findOne({ reservation: data.reservationID });
+            let chat = await Chat.findOne({ reservation: roomId });
             if (!chat) {
                 console.error('Chat not found');
                 return;
             }
 
-            const newMessage = { sender: data.sender, message: data.message, timestamp: new Date() };
+            chat.messages.forEach(message => {
+                if ((userType === 'customer' && message.sender === 'restaurant') ||
+                    (userType === 'restaurant' && message.sender === 'customer')) {
+                    if (message.readStatus === "notRead") {
+                        message.readStatus = "ReadIt";
+                    }
+                }
+            });
+
+            await chat.save();
+            io.to(roomId).emit('updateMessages', chat.messages);
+
+        } catch (error) {
+            console.error('Error updating message readStatus:', error);
+        }
+    });
+
+    socket.on('chatMessage', async (data) => {
+        console.log('Received chatMessage:', data);
+        try {
+            let chat = await Chat.findOne({ reservation: data.reservationID })
+            .populate('restaurant', 'restaurantName restaurantIcon')
+            if (!chat) {
+                console.error('Chat not found');
+                return;
+            }
+
+            const newMessage = {
+                sender: data.sender,
+                message: data.message,
+                timestamp: new Date(),
+                readStatus: 'notRead'
+            };
+
+
+            for (const socketId in connectedUsers) {
+                if (connectedUsers[socketId].roomId === data.reservationID) {
+                    if ((connectedUsers[socketId].userType === 'customer' && data.sender === 'restaurant') ||
+                        (connectedUsers[socketId].userType === 'restaurant' && data.sender === 'customer')) {
+                        newMessage.readStatus = 'ReadIt';
+                    }
+                }
+            }
+
             chat.messages.push(newMessage);
             await chat.save();
 
             io.to(data.reservationID).emit('message', newMessage);
+            const senderRestaurant = data.sender == 'restaurant'
+            if (senderRestaurant) {
+                console.log(chat.restaurant)
+                socket.broadcast.emit('notification', {
+                    restaurant: chat.restaurant.restaurantName,
+                    restaurantID: chat.restaurant.id,
+                    message: data.message,
+                    reservationID: data.reservationID,
+                });
+            }
 
-            socket.broadcast.emit('notification', {
-                sender: data.sender,
-                message: data.message,
-                reservationID: data.reservationID,
-            });
 
         } catch (error) {
             console.error('Error saving message to database:', error);
         }
     });
 
-    socket.on('disconnect', () => {
+    socket.on('leaveRoom', () => {
         console.log('Client disconnected');
+        connectedUsers[socket.id] = {};
     });
 });
 
