@@ -2,15 +2,6 @@ const nodemailer = require('nodemailer');
 
 const sendEmail = async (option) => {
     try {
-        // const transporter = nodemailer.createTransport({
-        //     host: 'live.smtp.mailtrap.io',
-        //     port: 587,
-        //     secure: false,
-        //     auth: {
-        //         user: 'api',
-        //         pass: '1b18455f7099e5b0a1e4ba16955cde9c'
-        //     },
-        // });
         const transporter = nodemailer.createTransport({
             service: "Gmail",
             host: "smtp.gmail.com",
@@ -23,12 +14,12 @@ const sendEmail = async (option) => {
           });
 
         const emailOptions = {
-            from: 'Jonggy@Support.com',
+            from: 'Jonggy Support <noreply.ntptv2545@gmail.com>',
             to: option.email,
             subject: option.subject,
-            text: option.message
+            text: option.message,
+            html:'<p>'+option.message+'<p>', 
         };
-
         await transporter.sendMail(emailOptions);
         console.log('Email sent successfully');
     } catch (error) {

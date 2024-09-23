@@ -203,8 +203,9 @@ router.post('/forgotPassword', async (req, res, next) => {
     const emailMessage = `To reset your password, use the OTP: ${resetToken}`;
     await sendEmail({
       email: user.email,
-      subject: 'Reset Password',
+      subject: 'Password Recovery From Jonggy',
       message: emailMessage,
+      otp:resetToken
     });
 
     res.status(200).json({ status: 'success', message: 'Reset link sent to user email' });
