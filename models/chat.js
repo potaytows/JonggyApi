@@ -29,7 +29,11 @@ const chatSchema = new mongoose.Schema({
       timestamp: {
         type: Date,
         default: Date.now
-      }
+      },
+      readStatus: {
+        type: String,
+        default: "notRead" 
+        }
     }
   ]
 });

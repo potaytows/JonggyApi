@@ -52,6 +52,37 @@ router.post('/postChat/:id', async (req, res) => {
     }
 });
 
+router.get('/notifications', async (req, res) => {
+    try {
+        const notifications = await Chat.find()
+            .populate('reservation', 'username')
+            .populate('restaurant', 'restaurantName restaurantIcon')
+            .exec();
+
+
+        const formattedNotifications = notifications.map(chat => {
+            const customerMessages = chat.messages.filter(msg => msg.sender === 'customer');
+            const LastCustomerMessages = customerMessages.length > 0
+                ? customerMessages.sort((a, b) => b.timestamp - a.timestamp)[0]
+                : null;
+            return {
+                id: chat._id,
+                reservationID: chat.reservation._id,
+                username: chat.reservation.username,
+                readStatus: chat.readStatus,
+                lastMessage: LastCustomerMessages ? LastCustomerMessages.message : 'No messages from customer yet',
+                timestamp: LastCustomerMessages ? LastCustomerMessages.timestamp : null,
+                readStatus: LastCustomerMessages.readStatus,
+
+            };
+        });
+
+        res.json({ notifications: formattedNotifications });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 
 
 module.exports = router;
