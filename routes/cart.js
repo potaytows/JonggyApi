@@ -46,7 +46,9 @@ router.post('/addToCart/', async function (req, res, next) {
     try {
         let totalPrice = 0;
         if (req.body.Count >= 1) {
-            totalPrice = (req.body.selectedMenuItem.price + req.body.selectedAddons.reduce((total, addon) => total + addon.price, 0)) * req.body.Count;
+            const addonTotalPrice = req.body.selectedAddons.reduce((total, addon) => total + addon.price, 0);
+            totalPrice = (req.body.selectedMenuItem.price * req.body.Count) + addonTotalPrice;
+            console.log(addonTotalPrice)
         }
         const existingCartItem = await CartModel.findOne({
             restaurantId: req.body.restaurantId,
@@ -62,14 +64,14 @@ router.post('/addToCart/', async function (req, res, next) {
                 const result = await existingCartItem.save();
                 res.send({ "status": "added", "obj": result });
 
-            }else if (existingCartItem.OrderTableType == "SingleTable" && existingCartItem.selectedTables[0]._id == req.body.selectedTables[0]._id) {
+            } else if (existingCartItem.OrderTableType == "SingleTable" && existingCartItem.selectedTables[0]._id == req.body.selectedTables[0]._id) {
                 existingCartItem.totalPrice += totalPrice;
                 existingCartItem.Count += req.body.Count;
                 const result = await existingCartItem.save();
                 res.send({ "status": "added", "obj": result });
 
             } else {
-                const newCart = new CartModel({ ...req.body, totalPrice }); 
+                const newCart = new CartModel({ ...req.body, totalPrice });
                 const result = await newCart.save();
                 res.send({ "status": "added", "obj": result });
 
