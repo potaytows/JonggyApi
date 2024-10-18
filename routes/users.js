@@ -15,8 +15,6 @@ function contains(arr, key, val) {
   }
   return false;
 }
-
-
 router.get('/getusers', async function (req, res, next) {
   try {
     const result = await UserModel.find({ role: "normal user" }, { 'password': 0 })
@@ -24,7 +22,6 @@ router.get('/getusers', async function (req, res, next) {
   } catch (error) {
     res.send(error)
   }
-
 });
 
 router.get('/getusers/:id', async function (req, res, next) {

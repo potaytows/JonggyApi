@@ -7,11 +7,11 @@ const TableSchema = new mongoose.Schema({
     },
     x: {
         type: Number,
-        default: 0
+        default: 160
     },
     y: {
         type: Number,
-        default: 0
+        default: 220
     },
     restaurant_id: {
         type: mongoose.Types.ObjectId, ref: "Restaurant",

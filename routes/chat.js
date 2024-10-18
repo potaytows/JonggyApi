@@ -59,7 +59,7 @@ router.get('/notifications', async (req, res) => {
             .populate('restaurant', 'restaurantName restaurantIcon')
             .exec();
 
-
+            
         const formattedNotifications = notifications.map(chat => {
             const customerMessages = chat.messages.filter(msg => msg.sender === 'customer');
             const LastCustomerMessages = customerMessages.length > 0
@@ -79,6 +79,7 @@ router.get('/notifications', async (req, res) => {
 
         res.json({ notifications: formattedNotifications });
     } catch (error) {
+        console.log(error.message)
         res.status(500).json({ message: error.message });
     }
 });
