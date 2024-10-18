@@ -62,10 +62,7 @@ io.on('connection', (socket) => {
         socket.join(roomId);
         console.log('Joined room:', roomId);
         console.log('user Joined room:', userType);
-
-
         connectedUsers[socket.id] = { roomId, userType };
-
         try {
             let chat = await Chat.findOne({ reservation: roomId });
             if (!chat) {
