@@ -18,6 +18,10 @@ const CartSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    Count: {
+        type: Number,
+        default: 1  // กำหนดค่าเริ่มต้นเป็น 1
+    },
     username: {
         type: String,
         required: true
@@ -51,7 +55,15 @@ const reservationSchema = new mongoose.Schema({
     },
     total: {
         type: Number,
-    }
+    },
+    statusLocation: {
+        type: String,
+        default: 'hideLocation'
+    },
+    locationCustomer: {
+        latitude: { type: Number },
+        longitude: { type: Number }
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Reservation', reservationSchema);

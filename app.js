@@ -18,6 +18,7 @@ var reserveRouter = require('./routes/reservation');
 var chatRoutes = require('./routes/chat');
 var restaurantsRouter = require('./routes/restaurants');
 const Chat = require('./models/chat');
+const Reservation =  require('./models/reservation');
 var app = express();
 
 var server = http.createServer(app);
@@ -58,6 +59,8 @@ const connectedUsers = {};
 io.on('connection', (socket) => {
     console.log('New client connected');
 
+    
+    
     socket.on('joinRoom', async (roomId, userType) => {
         socket.join(roomId);
         console.log('Joined room:', roomId);
@@ -86,6 +89,8 @@ io.on('connection', (socket) => {
             console.error('Error updating message readStatus:', error);
         }
     });
+
+    
 
     socket.on('chatMessage', async (data) => {
         console.log('Received chatMessage:', data);
@@ -135,6 +140,25 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('updateLocation', async (data) => {
+        const { reservationID, location } = data;
+        try {
+            const reservation = await Reservation.findById(reservationID);
+            if (reservation) {
+                reservation.locationCustomer = location;
+                await reservation.save();
+                console.log('Location updated:', location);
+    
+                io.to(reservationID).emit('locationUpdated', {
+                    reservationID,
+                    location,
+                });
+            }
+        } catch (error) {
+            console.error('Error updating location:', error);
+        }
+    });
+
     socket.on('leaveRoom', () => {
         console.log('Client disconnected');
         connectedUsers[socket.id] = {};
@@ -144,7 +168,7 @@ io.on('connection', (socket) => {
 const uri = "mongodb+srv://finalProject:EFpeUnSek3qtwsMf@cluster0.xoovbhu.mongodb.net/finalProject?retryWrites=true&w=majority";
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
-        server.listen(8080, () => {
+        server.listen(8000, () => {
             console.log('API is running on port 8080 http://localhost:8000/');
         });
     })
