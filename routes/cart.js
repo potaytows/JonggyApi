@@ -56,6 +56,7 @@ router.post('/addToCart/', async function (req, res, next) {
             selectedAddons: req.body.selectedAddons,
             OrderTableType: req.body.OrderTableType,
             username: req.body.username,
+            Count:req.body.Count,
         });
         if (existingCartItem) {
             if (existingCartItem.OrderTableType == "OrderTogether") {
