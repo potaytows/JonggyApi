@@ -7,18 +7,18 @@ const TableSchema = new mongoose.Schema({
     },
     x: {
         type: Number,
-        default: 0
+        default: 180
     },
     y: {
         type: Number,
-        default: 0
+        default: 210
     },
     restaurant_id: {
         type: mongoose.Types.ObjectId, ref: "Restaurant",
         required: true
     }, status: {
         type: String,
-        default: ""
+        default: "disabled"
     },
     type:{
         type:String,

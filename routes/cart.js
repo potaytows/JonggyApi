@@ -6,8 +6,8 @@ router.get('/getCartByUsername/:username/:restaurantID', async function (req, re
     try {
         const username = req.params.username;
         const restaurantID = req.params.restaurantID;
-
-        const Cart = await CartModel.find({ username: username, restaurantId: restaurantID })
+        const Cart = await CartModel.find({ username: username, restaurantId: restaurantID }).populate("Table")
+        console.log(Cart)
         res.send(Cart)
     } catch (error) {
         res.send(error)

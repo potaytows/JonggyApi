@@ -59,6 +59,7 @@ router.get('/latestMessages/:restaurantId', async (req, res) => {
             .populate('reservation', 'username')  
             .exec();
 
+
         const latestMessages = chats.map(chat => {
             const allMessages = chat.messages.sort((a, b) => b.timestamp - a.timestamp);  
             const lastMessage = allMessages.length > 0 ? allMessages[0] : null;
@@ -75,6 +76,7 @@ router.get('/latestMessages/:restaurantId', async (req, res) => {
 
         res.json({ latestMessages });
     } catch (error) {
+        console.log(error.message)
         res.status(500).json({ message: error.message });
         console.error('Error fetching latest messages:', error);
     }

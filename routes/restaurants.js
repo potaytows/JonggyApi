@@ -186,6 +186,30 @@ router.get('/getlikeRestaurants/:id', async function (req, res, next) {
     }
 
 });
+
+router.post('/toggleRestaurantStatus/:id', async function (req, res, next) {
+    try {
+        const result = await RestaurantModel.findOne({_id:req.params.id,owner:req.body.username},{restaurantIcon:0});
+        if(result){
+            if(result.status == "closed"){
+                result.status="open"
+                await result.save();
+                res.send(result);
+            }else if(result.status == "open"){
+                result.status="closed"
+                await result.save();
+                res.send(result);
+            }
+            
+        }else{
+            res.send("you do not have permission to close this restaurant")
+        }
+
+    } catch (error) {
+        console.log(error)
+    }
+
+
 router.put('/seveLocation/:restaurantId', async (req, res) => {
     const restaurantId = req.params.restaurantId;
     const { address, latitude, longitude } = req.body;
