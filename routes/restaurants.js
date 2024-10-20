@@ -209,5 +209,35 @@ router.post('/toggleRestaurantStatus/:id', async function (req, res, next) {
         console.log(error)
     }
 
+
+router.put('/seveLocation/:restaurantId', async (req, res) => {
+    const restaurantId = req.params.restaurantId;
+    const { address, latitude, longitude } = req.body;
+
+    console.log('Params:', req.params);
+    console.log('Body:', req.body);
+
+    try {
+        const updatedRestaurant = await RestaurantModel.findByIdAndUpdate(
+            restaurantId,
+            {
+                $set: {
+                    'location.address': address || 'Unknown Address',
+                    'location.coordinates.latitude': latitude || 0,
+                    'location.coordinates.longitude': longitude || 0,
+                },
+            },
+            { new: true }
+        );
+
+        if (!updatedRestaurant) {
+            return res.status(404).json({ message: 'Restaurant not found' });
+        }
+
+        res.status(200).json({ message: 'Location updated successfully', restaurant: updatedRestaurant });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error updating location', error });
+    }
 });
 module.exports = router;
