@@ -12,7 +12,7 @@ router.post('/reserveTables', async function (req, res, next) {
         let menus = await CartModel.find({ username: req.body.username, restaurantId: req.body.restaurant_id });
         newReservation.orderedFood = menus;
         menus.map((item) => {
-            Total += item.totalPrice * item.Count;  // นำ Count มาคูณกับราคา
+            Total += item.totalPrice * item.Count;  
         });
         newReservation.total = Total;
         newReservation.status = "รอการยืนยัน";

@@ -142,13 +142,15 @@ io.on('connection', (socket) => {
 
     socket.on('updateLocation', async (data) => {
         const { reservationID, location } = data;
+        console.log('Received location:', location); 
         try {
             const reservation = await Reservation.findById(reservationID);
             if (reservation) {
-                reservation.locationCustomer = location;
+                reservation.locationCustomer = location; 
                 await reservation.save();
                 console.log('Location updated:', location);
     
+                
                 io.to(reservationID).emit('locationUpdated', {
                     reservationID,
                     location,

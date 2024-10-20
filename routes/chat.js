@@ -52,37 +52,36 @@ router.post('/postChat/:id', async (req, res) => {
     }
 });
 
-router.get('/notifications', async (req, res) => {
+router.get('/latestMessages/:restaurantId', async (req, res) => {
     try {
-        const notifications = await Chat.find()
-            .populate('reservation', 'username')
-            .populate('restaurant', 'restaurantName restaurantIcon')
+        const restaurantId = req.params.restaurantId;
+        const chats = await Chat.find({ restaurant: restaurantId })
+            .populate('reservation', 'username')  
             .exec();
 
-            
-        const formattedNotifications = notifications.map(chat => {
-            const customerMessages = chat.messages.filter(msg => msg.sender === 'customer');
-            const LastCustomerMessages = customerMessages.length > 0
-                ? customerMessages.sort((a, b) => b.timestamp - a.timestamp)[0]
-                : null;
+
+        const latestMessages = chats.map(chat => {
+            const allMessages = chat.messages.sort((a, b) => b.timestamp - a.timestamp);  
+            const lastMessage = allMessages.length > 0 ? allMessages[0] : null;
+
             return {
                 id: chat._id,
-                reservationID: chat.reservation._id,
-                username: chat.reservation.username,
-                readStatus: chat.readStatus,
-                lastMessage: LastCustomerMessages ? LastCustomerMessages.message : 'No messages from customer yet',
-                timestamp: LastCustomerMessages ? LastCustomerMessages.timestamp : null,
-                readStatus: LastCustomerMessages.readStatus,
-
+                reservationID: chat.reservation ? chat.reservation._id : null,  
+                username: chat.reservation ? chat.reservation.username : 'Unknown',
+                lastMessage: lastMessage ? lastMessage.message : 'No messages yet',
+                timestamp: lastMessage ? lastMessage.timestamp : null,
+                readStatus: lastMessage ? lastMessage.readStatus : 'notRead',
             };
         });
 
-        res.json({ notifications: formattedNotifications });
+        res.json({ latestMessages });
     } catch (error) {
         console.log(error.message)
         res.status(500).json({ message: error.message });
+        console.error('Error fetching latest messages:', error);
     }
 });
+
 
 
 
