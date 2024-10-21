@@ -208,7 +208,7 @@ router.post('/toggleRestaurantStatus/:id', async function (req, res, next) {
     } catch (error) {
         console.log(error)
     }
-
+});
 
 router.put('/seveLocation/:restaurantId', async (req, res) => {
     const restaurantId = req.params.restaurantId;
