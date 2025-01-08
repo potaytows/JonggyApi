@@ -40,7 +40,7 @@ router.get('/:id', async function (req, res, next) {
 
 router.get('/getByUsername/:id', async function (req, res, next) {
     try {
-        const restaurants = await RestaurantModel.findOne({ owner: req.params.id },{restaurantIcon:0});
+        const restaurants = await RestaurantModel.findOne({ owner: req.params.id }, { restaurantIcon: 0 });
         res.json(restaurants)
 
     } catch (error) {
@@ -49,12 +49,8 @@ router.get('/getByUsername/:id', async function (req, res, next) {
 });
 
 
-
 router.post('/uploadImage/:id', upload.single('image'), async function (req, res, next) {
-    console.log(req.file)
-    if (req.file) {
-        filename = "/../uploads/" + req.file.filename
-    }
+    const filename = "/../uploads/" + req.file.filename
     try {
         const newRestaurant = await RestaurantModel.findOne({
             '_id': req.params.id
@@ -75,8 +71,25 @@ router.post('/uploadImage/:id', upload.single('image'), async function (req, res
     }
 });
 
+router.post('/editDetails/:id', async function (req, res, next) {
+    try {
+        const newRestaurant = await RestaurantModel.findOneAndUpdate({
+            '_id': req.params.id
+        }, { $set: req.body }, { new: true })
+        newRestaurant.save();
+        res.send({ "status": "Edit Succesfully" })
+    } catch (error) {
+        res.status(400).send(error)
+        console.log(error)
+    } finally {
+        if (req.file) {
+            fs.unlinkSync(path.join(__dirname + "/../uploads/" + req.file.filename))
+        }
+    }
+});
+
 router.post('/uploadImage/:id/default', async function (req, res, next) {
-    filename = "/../assets/default-restaurant"
+    const filename = "/../assets/default-restaurant"
     try {
         const newRestaurant = await RestaurantModel.findOne({
             '_id': req.params.id
@@ -162,7 +175,7 @@ router.put('/edit/:id', async function (req, res, next) {
                 $set: req.body
             }, { new: true });
 
-            const usereresult = await UserModel.findOneAndUpdate({ username: req.body.owner,}, {
+            const usereresult = await UserModel.findOneAndUpdate({ username: req.body.owner, }, {
                 $set: { role: "owner" }
             }, { new: true });
             console.log(result)
@@ -189,19 +202,19 @@ router.get('/getlikeRestaurants/:id', async function (req, res, next) {
 
 router.post('/toggleRestaurantStatus/:id', async function (req, res, next) {
     try {
-        const result = await RestaurantModel.findOne({_id:req.params.id,owner:req.body.username},{restaurantIcon:0});
-        if(result){
-            if(result.status == "closed"){
-                result.status="open"
+        const result = await RestaurantModel.findOne({ _id: req.params.id, owner: req.body.username }, { restaurantIcon: 0 });
+        if (result) {
+            if (result.status == "closed") {
+                result.status = "open"
                 await result.save();
                 res.send(result);
-            }else if(result.status == "open"){
-                result.status="closed"
+            } else if (result.status == "open") {
+                result.status = "closed"
                 await result.save();
                 res.send(result);
             }
-            
-        }else{
+
+        } else {
             res.send("you do not have permission to close this restaurant")
         }
 

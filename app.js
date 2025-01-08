@@ -13,6 +13,7 @@ var usersRouter = require('./routes/users');
 var tablesRouter = require('./routes/tables');
 var menusRouter = require('./routes/menu');
 var addonRouter = require('./routes/addon');
+var presetRouter = require('./routes/preset');
 var cartRouter = require('./routes/cart');
 var reserveRouter = require('./routes/reservation');
 var chatRoutes = require('./routes/chat');
@@ -52,6 +53,8 @@ app.use('/addons', addonRouter);
 app.use('/cart', cartRouter);
 app.use('/reservation', reserveRouter);
 app.use('/chat', chatRoutes);
+app.use('/preset', presetRouter);
+
 
 app.set('socketio', io);
 const connectedUsers = {};

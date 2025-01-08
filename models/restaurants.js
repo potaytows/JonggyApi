@@ -25,6 +25,9 @@ const RestaurantSchema = new mongoose.Schema({
             longitude: { type: Number, required: true, default: 0 } 
         }
     },
+    activePreset:{
+        type: mongoose.Types.ObjectId, ref: "Preset",
+    }
 
 }, { timestamps: true })
 

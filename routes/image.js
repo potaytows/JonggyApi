@@ -14,29 +14,36 @@ var storage = multer.diskStorage({
         cb(null, file.fieldname + '-' + Date.now())
     }
 });
-var upload = multer({ storage: storage });
-router.get('/', async function (req, res, next) {
-    try {
-        const restaurants = await RestaurantModel.find();
-        res.json(restaurants)
-
-    } catch (error) {
-        res.send(error)
-    }
-
-
-});
 
 router.get('/getRestaurantIcon/:id', async function (req, res, next) {
-    try {
-        const restaurants = await RestaurantModel.findById(req.params.id, { restaurantIcon: 1, _id: 0 });
-        var data = restaurants.restaurantIcon.data;
-        res.end(data);
+    if (req.params.id != null) {
+        try {
+            const restaurants = await RestaurantModel.findById(req.params.id, { restaurantIcon: 1, _id: 0 });
+            var data = restaurants.restaurantIcon.data;
+            res.end(data);
 
-    } catch (error) {
-        console.log(error)
-        res.send(error)
+        } catch (error) {
+            console.log(error)
+        }
+    }else{
+        console.log("id is null")
     }
+
+});
+router.get('/getRestaurantIcon/:id/:randomNum', async function (req, res, next) {
+    if (req.params.id != null) {
+        try {
+            const restaurants = await RestaurantModel.findById(req.params.id, { restaurantIcon: 1, _id: 0 });
+            var data = restaurants.restaurantIcon.data;
+            res.end(data);
+
+        } catch (error) {
+            console.log(error)
+        }
+    }else{
+        console.log("id is null")
+    }
+
 });
 router.get('/getMenuIcon/:id', async function (req, res, next) {
     try {
