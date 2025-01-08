@@ -6,6 +6,11 @@ var logger = require('morgan');
 var mongoose = require('mongoose');
 var http = require('http');
 var socketIo = require('socket.io');
+var cors = require('cors');
+var FormData = require('form-data');
+var multer = require('multer');
+var axios = require('axios');
+
 
 var imageRouter = require('./routes/image');
 var indexRouter = require('./routes/index');
@@ -17,8 +22,11 @@ var cartRouter = require('./routes/cart');
 var reserveRouter = require('./routes/reservation');
 var chatRoutes = require('./routes/chat');
 var restaurantsRouter = require('./routes/restaurants');
+var paymentRouter = require('./routes/payment');
+
+
 const Chat = require('./models/chat');
-const Reservation =  require('./models/reservation');
+const Reservation = require('./models/reservation');
 var app = express();
 
 var server = http.createServer(app);
@@ -30,6 +38,7 @@ var io = socketIo(server, {
 });
 
 // view engine setup
+app.use(cors());
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(logger('dev'));
@@ -52,6 +61,8 @@ app.use('/addons', addonRouter);
 app.use('/cart', cartRouter);
 app.use('/reservation', reserveRouter);
 app.use('/chat', chatRoutes);
+app.use('/payment', paymentRouter);
+
 
 app.set('socketio', io);
 const connectedUsers = {};
@@ -59,8 +70,6 @@ const connectedUsers = {};
 io.on('connection', (socket) => {
     console.log('New client connected');
 
-    
-    
     socket.on('joinRoom', async (roomId, userType) => {
         socket.join(roomId);
         console.log('Joined room:', roomId);
@@ -90,13 +99,13 @@ io.on('connection', (socket) => {
         }
     });
 
-    
+
 
     socket.on('chatMessage', async (data) => {
         console.log('Received chatMessage:', data);
         try {
             let chat = await Chat.findOne({ reservation: data.reservationID })
-            .populate('restaurant', 'restaurantName restaurantIcon')
+                .populate('restaurant', 'restaurantName restaurantIcon')
             if (!chat) {
                 console.error('Chat not found');
                 return;
@@ -142,15 +151,15 @@ io.on('connection', (socket) => {
 
     socket.on('updateLocation', async (data) => {
         const { reservationID, location } = data;
-        console.log('Received location:', location); 
+        console.log('Received location:', location);
         try {
             const reservation = await Reservation.findById(reservationID);
             if (reservation) {
-                reservation.locationCustomer = location; 
+                reservation.locationCustomer = location;
                 await reservation.save();
                 console.log('Location updated:', location);
-    
-                
+
+
                 io.to(reservationID).emit('locationUpdated', {
                     reservationID,
                     location,
@@ -158,6 +167,92 @@ io.on('connection', (socket) => {
             }
         } catch (error) {
             console.error('Error updating location:', error);
+        }
+    });
+
+    socket.on('uploadSlip', async (data) => {
+        try {
+            const { fileBuffer, fileName, totalP, username } = data;
+            console.log(username)
+            const reservation = await Reservation.findOne({ username }).exec();
+            if (!reservation) {
+                throw new Error('Reservation not found');
+            }
+
+            const reservationId = reservation._id;
+            console.log('Found Reservation ID:', reservationId);
+            const formData = new FormData();
+            formData.append('files', Buffer.from(fileBuffer), fileName);
+            const response = await axios.post('https://api.slipok.com/api/line/apikey/36142', formData, {
+                headers: {
+                    ...formData.getHeaders(),
+                    'x-authorization': 'SLIPOKXSUMTME',
+                },
+            });
+            const payments = response.data;
+            console.log('SlipOK Response:', payments);
+            const { transRef, transTime, transDate, sender, receiver, amount } = response.data.data;
+            if (receiver && receiver.name === 'MR. TAKACHI Y') {
+                console.log('Receiver name matches:', receiver.name);
+    
+                if (amount === totalP) {
+                    console.log('Amount matches:', amount);
+    
+                    if (transRef) {
+                        console.log('Transaction reference exists:', transRef);
+                    
+                        const existingReservation = await Reservation.findOne({ 'Payment.transRef': transRef }).exec();
+                        if (existingReservation) {
+                            console.error('Duplicate transaction reference detected:', transRef);
+                            socket.emit('uploadSlipError', {
+                                success: false,
+                                message: 'Duplicate transaction reference detected',
+                            });
+                            return; 
+                        }
+                    
+                        
+                        const paymentData = {
+                            transRef,
+                            sender,
+                            receiver,
+                            transTime,
+                            transDate,
+                            amount,
+                            status: 'success',
+                        };
+                        reservation.Payment.push(paymentData);
+                        await reservation.save();
+                        console.log('Payment information updated successfully');
+                    
+                    } else {
+                        console.error('Transaction reference is missing');
+                        socket.emit('uploadSlipError', {
+                            success: false,
+                            message: 'Transaction reference is missing',
+                        });
+                    }
+                } else {
+                    console.error('Amount mismatch:', amount, '!=', totalP);
+                    socket.emit('uploadSlipError', {
+                        success: false,
+                        message: 'Amount mismatch',
+                    });
+                }
+            } else {
+                console.error('Receiver name mismatch:', receiver?.name);
+                socket.emit('uploadSlipError', {
+                    success: false,
+                    message: 'Receiver name mismatch',
+                });
+            }
+        } catch (error) {
+            console.error('Error uploading slip:', error.message);
+            socket.emit('uploadSlipError', {
+                success: false,
+                message: 'Error uploading slip',
+                error: error.message,
+            });
         }
     });
 
