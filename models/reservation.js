@@ -43,11 +43,11 @@ const reservationSchema = new mongoose.Schema({
     orderedFood: [CartSchema],
     status: {
         type: String,
-        default: "รอการยืนยัน" 
+        default: "รอการยืนยัน"
     },
     statusCheckIn: {
         type: String,
-        default: "checkIn" 
+        default: "checkIn"
     },
     restaurant_id: {
         type: mongoose.Types.ObjectId, ref: "Restaurant",
@@ -64,6 +64,43 @@ const reservationSchema = new mongoose.Schema({
         latitude: { type: Number },
         longitude: { type: Number }
     },
+    Payment: [
+        {
+            transRef: {
+                type: String,
+                required: true
+            },
+            sender: [
+                {
+                    displayName: String,
+                    name: String
+                }
+            ],
+            receiver: [
+                {
+                    displayName: String,
+                    name: String
+                }
+            ],
+            transTime: {
+                type: String,
+                required: true
+            },
+            transDate: {
+                type: String,
+                required: true
+            },
+            amount: {
+                type: String,
+                required: true
+            },
+            status: {
+                type: String,
+                default: 'failed',
+                required: true
+            }
+        }
+    ]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Reservation', reservationSchema);
