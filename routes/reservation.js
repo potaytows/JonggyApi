@@ -7,22 +7,26 @@ const RestaurantModel = require('../models/restaurants');
 
 router.post('/reserveTables', async function (req, res, next) {
     try {
+        await ReservationModel.deleteMany({ username: req.body.username, status: "รอการยืนยัน" });
         let Total = 0;
         let newReservation = new ReservationModel(req.body);
         let menus = await CartModel.find({ username: req.body.username, restaurantId: req.body.restaurant_id });
+        
         newReservation.orderedFood = menus;
         menus.map((item) => {
             Total += item.totalPrice * item.Count;  
         });
+        
         newReservation.total = Total;
         newReservation.status = "รอการยืนยัน";
         await newReservation.save();
-        const ress = await CartModel.deleteMany({ username: req.body.username, restaurantId: req.body.restaurant_id });
+        
         res.send({ status: "reserved successfully", obj: newReservation });
     } catch (error) {
         res.send(error);
     }
 });
+
 
 
 router.get('/getReservationByRestaurantID/:id', async function (req, res, next) {
