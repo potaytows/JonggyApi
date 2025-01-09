@@ -43,20 +43,23 @@ router.get('/getbyRestaurantId/:id', async function (req, res, next) {
 });
 router.get('/changestatus/:id', async function (req, res, next) {
     try {
-        const table = await TableModel.findOne({_id:req.params.id});
+        const result = await PresetModel.findOne({"tables._id": req.params.id });
+        const tableindex = result.tables.findIndex((table)=> table._id.toString()===req.params.id);
+        const table = result.tables[tableindex];
         console.log(table)
         if(table.status === "enabled"){
             table.status = "disabled";
-            table.save();
+            result.save();
             res.json(table);
             
         }else if (table.status === "disabled"){
             table.status = "enabled";
-            table.save();
+            result.save();
             res.json(table);
         }
     } catch (error) {
         res.send(error)
+        console.log(error)
     }
 });
 
