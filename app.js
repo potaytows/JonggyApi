@@ -24,6 +24,9 @@ var reserveRouter = require('./routes/reservation');
 var chatRoutes = require('./routes/chat');
 var restaurantsRouter = require('./routes/restaurants');
 var paymentRouter = require('./routes/payment');
+var promotionRouter = require('./routes/promotion');
+var helpCenterRouter = require('./routes/helpCenter');
+
 
 
 const Chat = require('./models/chat');
@@ -64,6 +67,9 @@ app.use('/reservation', reserveRouter);
 app.use('/chat', chatRoutes);
 app.use('/preset', presetRouter);
 app.use('/payment', paymentRouter);
+app.use('/promotion', promotionRouter);
+app.use('/helpCenter', helpCenterRouter);
+
 
 
 
@@ -186,10 +192,10 @@ io.on('connection', (socket) => {
             console.log('Found Reservation ID:', reservationId);
             const formData = new FormData();
             formData.append('files', Buffer.from(fileBuffer), fileName);
-            const response = await axios.post('https://api.slipok.com/api/line/apikey/36142', formData, {
+            const response = await axios.post('https://api.slipok.com/api/line/apikey/37351', formData, {
                 headers: {
                     ...formData.getHeaders(),
-                    'x-authorization': 'SLIPOKXSUMTME',
+                    'x-authorization': 'SLIPOKEK1O7VQ',
                 },
             });
             const payments = response.data;
@@ -209,7 +215,7 @@ io.on('connection', (socket) => {
                             console.error('Duplicate transaction reference detected:', transRef);
                             socket.emit('uploadSlipError', {
                                 success: false,
-                                message: 'Duplicate transaction reference detected',
+                                message: 'สลิปของคุณเคยถูกใช้ไปแล้ว',
                             });
                             return; 
                         }
@@ -226,27 +232,32 @@ io.on('connection', (socket) => {
                         };
                         reservation.Payment.push(paymentData);
                         await reservation.save();
+                        socket.emit('uploadSlipSuccess', {
+                            success: true,
+                            message: 'ชำระเงินเสร็จสิ้น',
+                            reservationId: reservation
+                        });
                         console.log('Payment information updated successfully');
                     
                     } else {
                         console.error('Transaction reference is missing');
                         socket.emit('uploadSlipError', {
                             success: false,
-                            message: 'Transaction reference is missing',
+                            message: 'สลิปของคุณเคยถูกใช้ไปแล้ว',
                         });
                     }
                 } else {
                     console.error('Amount mismatch:', amount, '!=', totalP);
                     socket.emit('uploadSlipError', {
                         success: false,
-                        message: 'Amount mismatch',
+                        message: 'จำนวนเงินไม่ถูกต้อง',
                     });
                 }
             } else {
                 console.error('Receiver name mismatch:', receiver?.name);
                 socket.emit('uploadSlipError', {
                     success: false,
-                    message: 'Receiver name mismatch',
+                    message: 'ชื่อบัญชีผู้รับไม่ถูกต้อง',
                 });
             }
         } catch (error) {

@@ -8,16 +8,10 @@ const RestaurantModel = require('../models/restaurants');
 router.post('/reserveTables', async function (req, res, next) {
     try {
         await ReservationModel.deleteMany({ username: req.body.username, status: "รอการยืนยัน" });
-        let Total = 0;
         let newReservation = new ReservationModel(req.body);
         let menus = await CartModel.find({ username: req.body.username, restaurantId: req.body.restaurant_id });
-        
+
         newReservation.orderedFood = menus;
-        menus.map((item) => {
-            Total += item.totalPrice * item.Count;  
-        });
-        
-        newReservation.total = Total;
         newReservation.status = "รอการยืนยัน";
         await newReservation.save();
         
@@ -47,7 +41,7 @@ router.get('/getReservationsByUsername/:username', async function (req, res, nex
             .populate("orderedFood.selectedMenuItem", "-menu_icon")
             .populate("orderedFood.selectedAddons")
             .populate("restaurant_id", "-restaurantIcon")
-            .sort({ createdAt: 1 });
+            .sort({ createdAt: -1 });
         
         res.json(result);
     } catch (error) {
