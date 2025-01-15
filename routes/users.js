@@ -47,24 +47,30 @@ router.get('/getlikeUsers/:id', async function (req, res, next) {
 
 router.post('/auth', async function (req, res, next) {
   try {
-    const result = await UserModel.findOne({ 'username_lower': req.body.username.toLowerCase() })
-    if(result){
-      result.comparePassword(req.body.password, function (err, isMatch) {
-        
-        if (err) throw err;
-        if (isMatch) {
-          res.json({ "status": "auth success", "obj": result })
-  
-        } else {
-          res.json({ "status": "auth failed" })
-        }
-      });
+    const result = await UserModel.findOne({ 'username_lower': req.body.username.toLowerCase(),role:"normal user"})
+    if (result.isBanned == true) {
+      res.json({ "status": "banned" });
+    } else {
+      if (result) {
+        result.comparePassword(req.body.password, function (err, isMatch) {
 
-    }else{
-      res.json({ "status": "auth failed" })
-      
+          if (err) throw err;
+          if (isMatch) {
+            res.json({ "status": "auth success", "obj": result })
+
+          } else {
+            res.json({ "status": "auth failed" })
+          }
+        });
+
+      } else {
+        res.json({ "status": "auth failed" })
+
+      }
+
+
     }
-    
+
 
 
   } catch (error) {
@@ -102,20 +108,20 @@ router.post('/Auth/admin', async function (req, res, next) {
 router.post('/Auth/owner', async function (req, res, next) {
   try {
     const result = await UserModel.findOne({ 'username_lower': req.body.username.toLowerCase(), role: "owner" })
-    if(result){
+    if (result) {
       result.comparePassword(req.body.password, function (err, isMatch) {
         if (err) throw err;
         if (isMatch) {
           res.json({ "status": "auth success", "obj": result })
-  
+
         } else {
           res.json({ "status": "auth failed" })
         }
       });
-    }else{
+    } else {
       res.json({ "status": "auth failed" })
     }
-    
+
 
   } catch (error) {
     res.send(error)
@@ -202,7 +208,7 @@ router.post('/forgotPassword', async (req, res, next) => {
       email: user.email,
       subject: 'Password Recovery From Jonggy',
       message: emailMessage,
-      otp:resetToken
+      otp: resetToken
     });
 
     res.status(200).json({ status: 'success', message: 'Reset link sent to user email' });
@@ -286,9 +292,35 @@ router.post('/resetPassword/:email', async (req, res) => {
   }
 });
 
+router.get('/ban/:id', async (req, res) => {
+  try {
+    const id  = req.params.id.toLocaleLowerCase();
 
+    const user = await UserModel.findOne({
+      username_lower: id,
+    });
+    user.isBanned = true
+    await user.save()
+    res.json({ status: 'banned '+user.username });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
+router.get('/unban/:id', async (req, res) => {
+  try {
+    const id  = req.params.id.toLocaleLowerCase();
 
+    const user = await UserModel.findOne({
+      username_lower: id,
+    });
+    user.isBanned = false
+    await user.save()
+    res.json({ status: 'banned '+user.username });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 
 
