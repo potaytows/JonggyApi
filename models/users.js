@@ -40,11 +40,10 @@ const UserSchema = new mongoose.Schema({
     },isBanned:{
         type:Boolean,
         default:false
-    },
-    profileImage: {
-        data: Buffer,
-        contentType: String
-    }
+    },favorites:[{
+         type: mongoose.Types.ObjectId, ref: "Restaurant",
+
+    }]
 
 }, { timestamps: true })
 

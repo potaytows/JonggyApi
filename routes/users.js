@@ -135,6 +135,7 @@ router.post('/Auth/owner', async function (req, res, next) {
 router.post('/addUser', async function (req, res, next) {
   console.log(req.body);
   try {
+
     const usedEmail = await UserModel.findOne({ email: req.body.email });
     const usedUsername = await UserModel.findOne({ username_lower: req.body.username.toLowerCase() });
 

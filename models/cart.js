@@ -8,7 +8,7 @@ const CartSchema = new mongoose.Schema({
     selectedTables: [
         {
             _id: String,
-            tableName: String
+            text: String
         }
     ],
     selectedMenuItem: {

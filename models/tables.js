@@ -32,12 +32,6 @@ const TableSchema = new mongoose.Schema({
     },color:{
         type:String,
         default:'#ff8a24'
-    }
+    },
 }, { timestamps: true })
-
-
-
-
-
-
 module.exports = mongoose.model('Table', TableSchema)

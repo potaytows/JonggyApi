@@ -7,7 +7,6 @@ router.get('/getCartByUsername/:username/:restaurantID', async function (req, re
         const username = req.params.username;
         const restaurantID = req.params.restaurantID;
         const Cart = await CartModel.find({ username: username, restaurantId: restaurantID })
-        console.log(Cart)
         res.send(Cart)
     } catch (error) {
         res.send(error)
@@ -35,7 +34,7 @@ router.get('/getCart/:id', async function (req, res, next) {
 router.get('/getByRestaurantID/:id', async function (req, res, next) {
     try {
         const id = req.params.id
-        const Cart = await CartModel.find({ restaurantId: id });
+        const Cart = await CartModel.find({ restaurantId: id }).populate("Table");
         res.send(Cart)
     } catch (error) {
         res.send(error)
@@ -43,12 +42,12 @@ router.get('/getByRestaurantID/:id', async function (req, res, next) {
 });
 
 router.post('/addToCart/', async function (req, res, next) {
+    console.log(req.body)
     try {
         let totalPrice = 0;
         if (req.body.Count >= 1) {
             const addonTotalPrice = req.body.selectedAddons.reduce((total, addon) => total + addon.price, 0);
             totalPrice = (req.body.selectedMenuItem.price * req.body.Count) + addonTotalPrice;
-            console.log(addonTotalPrice)
         }
         const existingCartItem = await CartModel.findOne({
             restaurantId: req.body.restaurantId,
