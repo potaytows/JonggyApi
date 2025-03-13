@@ -5,12 +5,12 @@ const HelpModel = require('../models/helpCenter');
 
 router.post('/supportForm', async (req, res) => {
     try {
-        const { reservationId, username, email, topic, details } = req.body;
+        const { reservationId, username,restaurant_id, email, topic, details } = req.body;
 
-        if ( !reservationId || !username ||!email || !topic || !details  ) {
+        if ( !reservationId || !username ||!email ||!restaurant_id || !topic || !details  ) {
             return res.status(400).json({ error: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
         }
-        const supportForm = new HelpModel({ reservationId, username, email, topic, details });
+        const supportForm = new HelpModel({ reservationId, username, restaurant_id, email, topic, details });
         await supportForm.save();
 
         res.status(201).json({ message: 'ส่งแบบฟอร์มสำเร็จ', data: supportForm });
@@ -39,6 +39,23 @@ router.get('/:id', async (req, res) => {
         res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
     }
 });
+router.get('/user/:username', async (req, res) => {
+    try {
+        const { username } = req.params;
+        const userReports = await HelpModel.find({ username }).populate('reservationId')
+        .populate("restaurant_id")
+        ;
+        console.log()
+        if (userReports.length === 0) {
+            return res.status(404).json({ error: 'ไม่พบข้อมูลการรายงานของผู้ใช้' });
+        }
+
+        res.status(200).json(userReports);
+    } catch (error) {
+        res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
+    }
+});
+
 router.delete('/delete/:id', async (req, res) => {
     try {
         const { id } = req.params;

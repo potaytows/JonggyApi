@@ -40,6 +40,10 @@ const UserSchema = new mongoose.Schema({
     },isBanned:{
         type:Boolean,
         default:false
+    },
+    profileImage: {
+        data: Buffer,
+        contentType: String
     }
 
 }, { timestamps: true })
