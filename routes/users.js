@@ -143,13 +143,10 @@ router.post('/addUser', async function (req, res, next) {
       const result = await newuser.save();
       console.log(result)
       res.json({ "status": "added", "obj": result });
-
     } else {
       res.json({ "error": 'this email or username is already taken!!' })
     }
-
   } catch (error) {
-
     console.log(error)
     res.send(error)
   }

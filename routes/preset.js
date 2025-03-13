@@ -7,9 +7,7 @@ const RestaurantModel = require('../models/restaurants');
 
 router.get('/getpresetByRestaurantid/:id', async function (req, res, next) {
     try {
-
         const result = await PresetModel.find({ _id: req.params.id })
-
         console.log(result)
         res.send(result)
     } catch (error) {

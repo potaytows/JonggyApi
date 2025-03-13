@@ -3,18 +3,38 @@ var router = express.Router();
 const CartModel = require('../models/cart');
 const ReservationModel = require('../models/reservation');
 const RestaurantModel = require('../models/restaurants');
-
-
+const moment = require('moment-timezone');
 router.post('/reserveTables', async function (req, res, next) {
     try {
-        await ReservationModel.deleteMany({ username: req.body.username, status: "รอการยืนยัน" });
+        let localTimeZone = "Asia/Bangkok";
+
+        console.log("Start Time:", req.body.startTime);
+        console.log("End Time:", req.body.endTime);
+
+        req.body.startTime = moment.utc(req.body.startTime).toDate();
+        req.body.endTime = moment.utc(req.body.endTime).toDate();
+
+        console.log("Formatted Start Time:", req.body.startTime);
+        console.log("Formatted End Time:", req.body.endTime);
+
+        await ReservationModel.deleteMany({
+            username: req.body.username,
+            status: "รอการยืนยัน",
+            restaurant_id: req.body.restaurant_id
+        });
+
         let newReservation = new ReservationModel(req.body);
-        let menus = await CartModel.find({ username: req.body.username, restaurantId: req.body.restaurant_id });
+
+        // Find the menus
+        let menus = await CartModel.find({
+            username: req.body.username,
+            restaurantId: req.body.restaurant_id
+        });
 
         newReservation.orderedFood = menus;
         newReservation.status = "รอการยืนยัน";
         await newReservation.save();
-        
+
         res.send({ status: "reserved successfully", obj: newReservation });
     } catch (error) {
         res.send(error);
@@ -23,9 +43,10 @@ router.post('/reserveTables', async function (req, res, next) {
 
 
 
+
 router.get('/getReservationByRestaurantID/:id', async function (req, res, next) {
     try {
-        const result = await ReservationModel.find({ restaurant_id: req.params.id }).populate("reservedTables").populate("orderedFood.selectedTables","-x -y").populate("orderedFood.selectedMenuItem","-menu_icon").populate("orderedFood.selectedAddons").populate("restaurant_id","-restaurantIcon").sort({ createdAt: 1 })
+        const result = await ReservationModel.find({ restaurant_id: req.params.id }).populate("reservedTables").populate("orderedFood.selectedTables", "-x -y").populate("orderedFood.selectedMenuItem", "-menu_icon").populate("orderedFood.selectedAddons").populate("restaurant_id", "-restaurantIcon").sort({ createdAt: 1 })
         res.json(result)
     } catch (error) {
         res.send(error)
@@ -42,7 +63,7 @@ router.get('/getReservationsByUsername/:username', async function (req, res, nex
             .populate("orderedFood.selectedAddons")
             .populate("restaurant_id", "-restaurantIcon")
             .sort({ createdAt: -1 });
-        
+
         res.json(result);
     } catch (error) {
         res.status(500).send(error);
@@ -53,14 +74,24 @@ router.get('/getReservationsByUsername/:username', async function (req, res, nex
 
 router.delete('/cancelReservation/:id', async function (req, res, next) {
     try {
-        const result = await ReservationModel.findByIdAndDelete(req.params.id);
-        if (result) {
-            res.send({ status: "deleted successfully" });
-        } else {
-            res.status(404).send({ status: "reservation not found" });
+        const { username } = req.body; 
+        const reservation = await ReservationModel.findById(req.params.id);
+        if (!reservation) {
+            return res.status(404).send({ status: "Reservation not found" });
         }
+        const cancelledAtThailand = moment().tz("Asia/Bangkok").toDate();
+        reservation.cancellation = {
+            cancelledBy: username,
+            cancelledAt: cancelledAtThailand
+        };
+        await reservation.save(); 
+        res.send({ 
+            status: "Reservation cancelled successfully", 
+            cancelledAt: cancelledAtThailand,
+            reservation 
+        });
     } catch (error) {
-        res.send(error);
+        res.status(500).send({ error: error.message });
     }
 });
 router.put('/confirmReservation/:id', async function (req, res, next) {
@@ -78,7 +109,7 @@ router.put('/confirmReservation/:id', async function (req, res, next) {
 
 router.put('/cancelReservation/:id', async function (req, res, next) {
     try {
-        const result = await ReservationModel.findByIdAndUpdate(req.params.id, { status: "ยกเลิกการจองแล้ว",status_CheckIn: "checkOut" }, { new: true });
+        const result = await ReservationModel.findByIdAndUpdate(req.params.id, { status: "ยกเลิกการจองแล้ว", status_CheckIn: "checkOut" }, { new: true });
         if (result) {
             res.send({ status: "confirmed successfully", obj: result });
         } else {
@@ -126,6 +157,39 @@ router.get('/userLocation/:id', async (req, res) => {
     } catch (error) {
         console.error('Error fetching locationCustomer:', error);
         res.status(500).json({ message: 'Server error' });
+    }
+});
+router.get('/getReservedTimes/:restaurantId', async (req, res) => {
+    const { restaurantId } = req.params;
+
+    try {
+        const currentTime = moment.tz('Asia/Bangkok');
+
+        const reservations = await ReservationModel.find({ restaurant_id: restaurantId })
+            .select('reservedTables startTime endTime')
+            .populate('reservedTables', 'text');
+
+        let reservedTimes = {};
+
+        reservations.forEach(reservation => {
+            if (moment(reservation.startTime).tz('Asia/Bangkok').isAfter(currentTime)) {
+                reservation.reservedTables.forEach(table => {
+                    if (!reservedTimes[table._id]) {
+                        reservedTimes[table._id] = [];
+                    }
+                    reservedTimes[table._id].push({
+                        startTime: reservation.startTime,
+                        endTime: reservation.endTime,
+                    });
+                });
+            }
+        });
+
+        console.log(reservedTimes);
+        return res.status(200).json(reservedTimes);
+    } catch (error) {
+        console.error('Error fetching reserved times:', error);
+        return res.status(500).json({ error: 'An error occurred while fetching reserved times.' });
     }
 });
 

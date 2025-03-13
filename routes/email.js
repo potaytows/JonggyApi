@@ -8,17 +8,17 @@ const sendEmail = async (option) => {
             port: 465,
             secure: true,
             auth: {
-              user: "ntptv2545@gmail.com",
-              pass: "oryb tdxn ybom yudx",
+                user: "ntptv2545@gmail.com",
+                pass: "oryb tdxn ybom yudx",
             },
-          });
+        });
 
         const emailOptions = {
             from: 'Jonggy Support <noreply.ntptv2545@gmail.com>',
             to: option.email,
             subject: option.subject,
             text: option.message,
-            html:'<p>'+option.message+'<p>', 
+            html: '<p>' + option.message + '<p>',
         };
         await transporter.sendMail(emailOptions);
         console.log('Email sent successfully');
