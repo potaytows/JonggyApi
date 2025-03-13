@@ -41,6 +41,7 @@ const UserSchema = new mongoose.Schema({
         type:Boolean,
         default:false
     },favorites:[{
+         type: mongoose.Types.ObjectId, ref: "Restaurant",
 
     }]
 

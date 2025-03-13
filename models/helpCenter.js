@@ -15,6 +15,11 @@ const HelpCenterFormSchema = new mongoose.Schema({
         required: true,
         match: [/.+\@.+\..+/, 'Invalid email format'],
     },
+    restaurant_id:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Restaurant',
+        required: true, 
+    },
     topic: {
         type: String,
         required: true,

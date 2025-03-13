@@ -131,27 +131,32 @@ router.post('/Auth/owner', async function (req, res, next) {
 });
 
 
-router.post('/addUser', async function (req, res, next) {
-  console.log(req.body)
-  try {
-    const usedEmail = await UserModel.find({}, { 'email': 1, '_id': 0 })
-    const usedUsername = await UserModel.find({}, { 'username_lower': 1, '_id': 0 })
-    const lowerUsername = req.body.username.toLowerCase()
-    if (!contains(usedEmail, "email", req.body.email) && !contains(usedUsername, "username_lower", lowerUsername)) {
-      const newuser = new UserModel(req.body);
-      newuser.username_lower = req.body.username.toLowerCase();
-      const result = await newuser.save();
-      console.log(result)
-      res.json({ "status": "added", "obj": result });
-    } else {
-      res.json({ "error": 'this email or username is already taken!!' })
-    }
-  } catch (error) {
-    console.log(error)
-    res.send(error)
-  }
 
+router.post('/addUser', async function (req, res, next) {
+  console.log(req.body);
+  try {
+
+    const usedEmail = await UserModel.findOne({ email: req.body.email });
+    const usedUsername = await UserModel.findOne({ username_lower: req.body.username.toLowerCase() });
+
+    if (usedEmail) {
+      return res.status(400).json({ error: 'Email นี้ถูกใช้แล้ว!' });
+    }
+    if (usedUsername) {
+      return res.status(400).json({ error: 'Username นี้ถูกใช้แล้ว!' });
+    }
+    const newuser = new UserModel(req.body);
+    newuser.username_lower = req.body.username.toLowerCase();
+    const result = await newuser.save();
+    console.log(result);
+    res.json({ status: 'added', obj: result });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'เกิดข้อผิดพลาดในการลงทะเบียน' });
+  }
 });
+
 
 router.put('/edit/:id', async function (req, res, next) {
   console.log(req.body)
