@@ -27,6 +27,16 @@ const RestaurantSchema = new mongoose.Schema({
     },
     activePreset:{
         type: mongoose.Types.ObjectId, ref: "Preset",
+    },activeTime:{
+        open:{
+            type:Date
+        },close:{
+            type:Date
+        }
+    },hasPromotion:{
+        type:Boolean
+    },isRecomened:{
+        type:Boolean
     }
 
 }, { timestamps: true })

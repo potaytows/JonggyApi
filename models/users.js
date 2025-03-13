@@ -40,7 +40,9 @@ const UserSchema = new mongoose.Schema({
     },isBanned:{
         type:Boolean,
         default:false
-    }
+    },favorites:[{
+
+    }]
 
 }, { timestamps: true })
 

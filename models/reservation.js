@@ -100,7 +100,23 @@ const reservationSchema = new mongoose.Schema({
                 required: true
             }
         }
-    ]
+    ], startTime: {
+        type: Date
+    }, endTime: {
+        type: Date
+    }, cancellation: {
+        cancelledBy: {
+            type: mongoose.Types.ObjectId, ref: "User",
+        }, cancelledAt: {
+            type: Date
+        }
+    }, approval: {
+        cancelledBy: {
+            type: String,
+        }, cancelledAt: {
+            type: Date
+        }
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Reservation', reservationSchema);
