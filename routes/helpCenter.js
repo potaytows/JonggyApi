@@ -5,12 +5,12 @@ const HelpModel = require('../models/helpCenter');
 
 router.post('/supportForm', async (req, res) => {
     try {
-        const { reservationId, username,restaurant_id, email, topic, details } = req.body;
+        const { reservationId, username,restaurant_id, email, topic, details,whosend } = req.body;
 
-        if ( !reservationId || !username ||!email ||!restaurant_id || !topic || !details  ) {
+        if ( !reservationId || !username ||!email ||!restaurant_id || !topic || !details ||!whosend  ) {
             return res.status(400).json({ error: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
         }
-        const supportForm = new HelpModel({ reservationId, username, restaurant_id, email, topic, details });
+        const supportForm = new HelpModel({ reservationId, username, restaurant_id, email, topic, details, whosend });
         await supportForm.save();
 
         res.status(201).json({ message: 'ส่งแบบฟอร์มสำเร็จ', data: supportForm });
@@ -21,7 +21,9 @@ router.post('/supportForm', async (req, res) => {
 
 router.get('/', async (req, res) => {
     try {
-        const forms = await HelpModel.find().populate('reservationId');
+        const forms = await HelpModel.find().populate('reservationId')
+        .populate("restaurant_id")
+        ;
         res.status(200).json(forms);
     } catch (error) {
         res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
@@ -30,7 +32,9 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
     try {
-        const form = await HelpModel.findById(req.params.id).populate('reservationId');
+        const form = await HelpModel.findById(req.params.id).populate('reservationId')
+        .populate("restaurant_id")
+            ;
         if (!form) {
             return res.status(404).json({ error: 'ไม่พบข้อมูลแบบฟอร์ม' });
         }
