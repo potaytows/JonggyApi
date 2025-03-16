@@ -56,7 +56,14 @@ router.get('/getReservationByRestaurantID/:id', async function (req, res, next) 
 router.get('/getReservationsByUsername/:username', async function (req, res, next) {
     try {
         const { username } = req.params;
-        const result = await ReservationModel.find({ username: username })
+        const { restaurantId } = req.query; 
+
+        const filter = { username: username };
+        if (restaurantId) {
+            filter.restaurant_id = restaurantId; 
+        }
+
+        const result = await ReservationModel.find(filter)
             .populate("reservedTables")
             .populate("orderedFood.selectedTables", "-x -y")
             .populate("orderedFood.selectedMenuItem", "-menu_icon")
@@ -67,8 +74,10 @@ router.get('/getReservationsByUsername/:username', async function (req, res, nex
         res.json(result);
     } catch (error) {
         res.status(500).send(error);
+        console.log(error)
     }
 });
+
 
 
 

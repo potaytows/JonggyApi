@@ -90,14 +90,16 @@ router.post('/addToCart/', async function (req, res, next) {
     }
 });
 
-router.get('/deleteCart/:id', async function (req, res, next) {
-    console.log(req.params.id)
-    const id = req.params.id
+router.delete('/deleteCartById/:cartId', async (req, res) => {
     try {
-        const result = await CartModel.findOneAndDelete({ _id: id })
-        res.send({ "status": "deleted", "obj": result })
+        const { cartId } = req.params;
+        const deletedCart = await CartModel.findByIdAndDelete(cartId);
+        if (!deletedCart) {
+            return res.status(404).send({ message: 'Cart not found' });
+        }
+        res.status(200).send({ message: 'Cart deleted successfully' });
     } catch (error) {
-        res.status(400).send(error)
+        res.status(500).send({ message: 'Error deleting cart', error });
         console.log(error)
     }
 });
