@@ -29,6 +29,10 @@ const HelpCenterFormSchema = new mongoose.Schema({
         required: true,
         maxlength: 1500,
     },
+    whosend: {
+        type: String,
+        required: true,
+    },
     createdAt: {
         type: Date,
         default: Date.now,
