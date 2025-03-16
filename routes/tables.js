@@ -18,11 +18,9 @@ router.get('/', async function (req, res, next) {
 });
 router.get('/:id', async function (req, res, next) {
     try {
-        const result = await PresetModel.findOne({ "tables._id": req.params.id });
-        const tableindex = result.tables.findIndex((table) => table._id.toString() === req.params.id);
-        const table = result.tables[tableindex];
-        console.log(table)
-        res.json(table)
+        const result = await TableModel.findById(req.params.id);
+        console.log(result)
+        res.json(result)
     } catch (error) {
         res.send(error)
 

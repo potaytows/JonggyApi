@@ -30,7 +30,7 @@ router.get('/getRestaurantIcon/:id', async function (req, res, next) {
     }
 
 });
-router.get('/getRestaurantIcon/:id/:randomNum', async function (req, res, next) {
+router.get('/getRestaurantIcon/:id', async function (req, res, next) {
     if (req.params.id != null) {
         try {
             const restaurants = await RestaurantModel.findById(req.params.id, { restaurantIcon: 1, _id: 0 });
@@ -45,7 +45,7 @@ router.get('/getRestaurantIcon/:id/:randomNum', async function (req, res, next) 
     }
 
 });
-router.get('/getMenuIcon/:id/:randomNum', async function (req, res, next) {
+router.get('/getMenuIcon/:id', async function (req, res, next) {
     try {
         const restaurants = await MenuModel.findById(req.params.id, { menu_icon: 1, _id: 0 });
         var data = restaurants.menu_icon.data;

@@ -116,7 +116,10 @@ const reservationSchema = new mongoose.Schema({
         }, cancelledAt: {
             type: Date
         }
-    }
+    },  wwtransfer_slip: {
+        data: Buffer,
+        contentType: String
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Reservation', reservationSchema);
