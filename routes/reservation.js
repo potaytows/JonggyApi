@@ -84,6 +84,35 @@ router.get('/getReservationsByUsername/:username', async function (req, res, nex
     }
 });
 
+router.get('/getActiveReservation/:username', async function (req, res, next) {
+    try {
+        const { username } = req.params;
+        const { restaurantId } = req.query;
+
+        const filter = { 
+            username: username, 
+            status: { $ne: "ยืนยันแล้ว" } // Exclude confirmed reservations
+        };
+
+        if (restaurantId) {
+            filter.restaurant_id = restaurantId; 
+        }
+
+        const result = await ReservationModel.find(filter)
+            .populate("reservedTables")
+            .populate("orderedFood.selectedTables", "-x -y")
+            .populate("orderedFood.selectedMenuItem", "-menu_icon")
+            .populate("orderedFood.selectedAddons")
+            .populate("restaurant_id", "-restaurantIcon")
+            .sort({ createdAt: -1 });
+
+        res.json(result);
+    } catch (error) {
+        res.status(500).send(error);
+        console.log(error);
+    }
+});
+
 
 
 
