@@ -85,28 +85,19 @@ router.post('/addTable', async function (req, res, next) {
 });
 router.delete('/delete/:id', async function (req, res, next) {
     try {
-        const result = await PresetModel.findOne({ "tables._id": req.params.id });
-        result.tables.pull({ _id: req.params.id })
-        result.save()
+        const result = await TableModel.findOneAndDelete({ _id: req.params.id });
         res.send({ "status": "deleted", "object": result })
     } catch (error) {
         res.send(error)
     }
 });
 
-router.put('/edit/:id/:restaurant_id', async function (req, res, next) {
+router.put('/edit/:id', async function (req, res, next) {
     try {
         const result = await TableModel.findOneAndUpdate(
             { _id: req.params.id },
             { $set: req.body });
         console.log(result);
-
-        // const result = await PresetModel.findOne({ restaurant_id: req.params.restaurant_id, "tables._id": req.params.id });
-        // const tableindex = result.tables.findIndex((table) => table._id.toString() === req.params.id);
-        // let table = result.tables[tableindex];
-        // for (var key in req.body) {
-        //     table[key] = req.body[key]
-        // }
         result.save();
         res.send({ "status": "edited", "object": result })
     } catch (error) {
