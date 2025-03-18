@@ -181,14 +181,13 @@ io.on('connection', (socket) => {
 
     socket.on('uploadSlip', async (data) => {
         try {
-            const { fileBuffer, fileName, totalP, username } = data;
-            console.log(username)
-            const reservation = await Reservation.findOne({ username }).exec();
+            const { fileBuffer, fileName, totalP, username,reservationId } = data;
+            console.log(reservationId)
+            const reservation = await Reservation.findOne({_id:reservationId }).exec();
             if (!reservation) {
                 throw new Error('Reservation not found');
             }
 
-            const reservationId = reservation._id;
             console.log('Found Reservation ID:', reservationId);
             const formData = new FormData();
             formData.append('files', Buffer.from(fileBuffer), fileName);
