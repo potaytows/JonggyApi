@@ -323,7 +323,41 @@ router.get('/unban/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+router.get('/favorites/:username', async (req, res) => {
+  try {
+      const username = req.params.username.toLocaleLowerCase();
+      const user = await UserModel.findOne({username_lower:username}).populate('favorites');
 
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+      res.json({ favorites: user.favorites });
+  } catch (error) {
+      res.status(500).json({ message: 'Server error', error });
+      console.log(error)
+  }
+});
 
+router.post('/favorite', async (req, res) => {
+  try {
+      const { username } = req.body; 
+      const { restaurantId } = req.body; 
+      const user = await UserModel.findOne({ username:username });
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+      const index = user.favorites.indexOf(restaurantId);
+      if (index === -1) {
+          user.favorites.push(restaurantId);
+      } else {
+          user.favorites.splice(index, 1);
+      }
+      await user.save();
+      res.json({ favorites: user.favorites });
+  } catch (error) {
+      res.status(500).json({ message: 'Server error', error });
+    
+  }
+});
 
 module.exports = router;
