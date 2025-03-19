@@ -26,11 +26,15 @@ var restaurantsRouter = require('./routes/restaurants');
 var paymentRouter = require('./routes/payment');
 var promotionRouter = require('./routes/promotion');
 var helpCenterRouter = require('./routes/helpCenter');
+var walletRouter = require('./routes/wallet');
+
 
 
 
 const Chat = require('./models/chat');
 const Reservation = require('./models/reservation');
+const Wallet = require('./models/wallet');
+
 var app = express();
 
 var server = http.createServer(app);
@@ -69,6 +73,9 @@ app.use('/preset', presetRouter);
 app.use('/payment', paymentRouter);
 app.use('/promotion', promotionRouter);
 app.use('/helpCenter', helpCenterRouter);
+app.use('/wallet', walletRouter);
+
+
 
 
 
@@ -181,13 +188,13 @@ io.on('connection', (socket) => {
 
     socket.on('uploadSlip', async (data) => {
         try {
-            const { fileBuffer, fileName, totalP, username,reservationId } = data;
-            console.log(reservationId)
-            const reservation = await Reservation.findOne({_id:reservationId }).exec();
+            const { fileBuffer, fileName, totalP, username, restaurant_id } = data;
+            const reservation = await Reservation.findOne({ username }).exec();
             if (!reservation) {
                 throw new Error('Reservation not found');
             }
 
+            const reservationId = reservation._id;
             console.log('Found Reservation ID:', reservationId);
             const formData = new FormData();
             formData.append('files', Buffer.from(fileBuffer), fileName);
@@ -202,13 +209,13 @@ io.on('connection', (socket) => {
             const { transRef, transTime, transDate, sender, receiver, amount } = response.data.data;
             if (receiver && receiver.name === 'MR. TAKACHI Y') {
                 console.log('Receiver name matches:', receiver.name);
-    
+
                 if (amount === totalP) {
                     console.log('Amount matches:', amount);
-    
+
                     if (transRef) {
                         console.log('Transaction reference exists:', transRef);
-                    
+
                         const existingReservation = await Reservation.findOne({ 'Payment.transRef': transRef }).exec();
                         if (existingReservation) {
                             console.error('Duplicate transaction reference detected:', transRef);
@@ -216,10 +223,8 @@ io.on('connection', (socket) => {
                                 success: false,
                                 message: 'สลิปของคุณเคยถูกใช้ไปแล้ว',
                             });
-                            return; 
+                            return;
                         }
-                    
-                        
                         const paymentData = {
                             transRef,
                             sender,
@@ -231,13 +236,40 @@ io.on('connection', (socket) => {
                         };
                         reservation.Payment.push(paymentData);
                         await reservation.save();
+
+                        const wallet = await Wallet.findOne({ restaurant_id }).exec();
+                        if (!wallet) {
+                            // ถ้ายังไม่มี wallet ให้สร้างใหม่
+                            const newWallet = new Wallet({
+                                restaurant_id,
+                                wallet: {
+                                    balance: amount * 0.97, // ตั้งค่า balance เริ่มต้น
+                                    transactions: [{
+                                        amount,
+                                        netAmount: amount * 0.97,
+                                        date: new Date(),
+                                    }]
+                                }
+                            });
+                            await newWallet.save();
+                        } else {
+                            // ถ้ามี wallet แล้วให้เพิ่ม transaction
+                            wallet.wallet.transactions.push({
+                                amount,
+                                netAmount: amount * 0.97,
+                                date: new Date(),
+                            });
+                            wallet.wallet.balance += amount * 0.97;
+                            await wallet.save();
+                        }
+
                         socket.emit('uploadSlipSuccess', {
                             success: true,
                             message: 'ชำระเงินเสร็จสิ้น',
                             reservationId: reservation
                         });
                         console.log('Payment information updated successfully');
-                    
+
                     } else {
                         console.error('Transaction reference is missing');
                         socket.emit('uploadSlipError', {

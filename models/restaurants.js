@@ -37,8 +37,7 @@ const RestaurantSchema = new mongoose.Schema({
         type:Boolean
     },isRecomened:{
         type:Boolean
-    }
-
+    },
 }, { timestamps: true })
 
 
