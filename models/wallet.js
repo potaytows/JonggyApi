@@ -8,7 +8,7 @@ const WalletSchema = new mongoose.Schema({
     },
     bankAccount: [{
         bankName: { type: String, required: true },
-        accountName: { type: String, required: true }, 
+        accountName: { type: String, required: true },
         accountNumber: { type: String, required: true },
     }],
     wallet: {
@@ -22,7 +22,10 @@ const WalletSchema = new mongoose.Schema({
             amount: { type: Number, required: true }, // จำนวนเงินที่ถอน
             status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" }, // สถานะการถอน
             date: { type: Date, default: Date.now },
-            proofImage: { type: String, default: null }
+            proofImage: { type: String, default: null },
+            bankName: { type: String, required: true },
+            accountName: { type: String, required: true },
+            accountNumber: { type: String, required: true },
         }]
     }
 
