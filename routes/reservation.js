@@ -6,7 +6,6 @@ const RestaurantModel = require('../models/restaurants');
 const moment = require('moment-timezone');
 router.post('/reserveTables', async function (req, res, next) {
     try {
-        let localTimeZone = "Asia/Bangkok";
 
         console.log("Start Time:", req.body.startTime);
         console.log("End Time:", req.body.endTime);
@@ -83,7 +82,23 @@ router.get('/getReservationsByUsername/:username', async function (req, res, nex
         console.log(error)
     }
 });
-
+router.get('/getReservationsById/:id', async function (req, res, next) {
+    try {
+        const { id } = req.params; 
+        const result = await ReservationModel.find({_id:id})
+            .populate("reservedTables")
+            .populate("orderedFood.selectedTables", "-x -y")
+            .populate("orderedFood.selectedMenuItem", "-menu_icon")
+            .populate("orderedFood.selectedAddons")
+            .populate("restaurant_id", "-restaurantIcon")
+            .sort({ createdAt: -1 });
+        console.log(result)
+        res.json(result);
+    } catch (error) {
+        res.status(500).send(error);
+        console.log(error)
+    }
+});
 router.get('/getActiveReservation/:username', async function (req, res, next) {
     try {
         const { username } = req.params;
@@ -91,7 +106,7 @@ router.get('/getActiveReservation/:username', async function (req, res, next) {
 
         const filter = { 
             username: username, 
-            status: { $ne: "ยืนยันแล้ว" } // Exclude confirmed reservations
+            status: { $ne: "ยืนยันแล้ว" } 
         };
 
         if (restaurantId) {
