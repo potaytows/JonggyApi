@@ -25,6 +25,14 @@ router.get('/', async function (req, res, next) {
         res.send(error)
     }
 });
+router.get('/getOpen', async function (req, res, next) {
+    try {
+        const restaurants = await RestaurantModel.find({status:{$ne:"closed"}},{ restaurantIcon: 0 } );
+        res.json(restaurants);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 router.get('/:id', async function (req, res, next) {
     try {
