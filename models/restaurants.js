@@ -29,9 +29,11 @@ const RestaurantSchema = new mongoose.Schema({
         type: mongoose.Types.ObjectId, ref: "Preset",
     },activeTime:{
         open:{
-            type:Date
+            type:String,
+            default:"00:00"
         },close:{
-            type:Date
+            type:String,
+            default:"22:00"
         }
     },hasPromotion:{
         type:Boolean
