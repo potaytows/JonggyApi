@@ -200,6 +200,7 @@ io.on('connection', (socket) => {
                     'x-authorization': 'SLIPOKEK1O7VQ',
                 },
             });
+            console.log(restaurant_id)
             const payments = response.data;
             console.log('SlipOK Response:', payments);
             const { transRef, transTime, transDate, sender, receiver, amount } = response.data.data;
