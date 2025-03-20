@@ -165,6 +165,18 @@ router.put('/confirmReservation/:id', async function (req, res, next) {
         res.send(error);
     }
 });
+router.put('/successReservation/:id', async function (req, res, next) {
+    try {
+        const result = await ReservationModel.findByIdAndUpdate(req.params.id, { status: "เสร้จสิ้นแล้ว" }, { new: true });
+        if (result) {
+            res.send({ status: "confirmed successfully", obj: result });
+        } else {
+            res.status(404).send({ status: "reservation not found" });
+        }
+    } catch (error) {
+        res.send(error);
+    }
+});
 
 router.put('/cancelReservation/:id', async function (req, res, next) {
     try {
