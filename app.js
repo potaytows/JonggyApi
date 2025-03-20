@@ -150,7 +150,6 @@ io.on('connection', (socket) => {
             io.to(data.reservationID).emit('message', newMessage);
             const senderRestaurant = data.sender == 'restaurant'
             if (senderRestaurant) {
-                console.log(chat.restaurant)
                 socket.broadcast.emit('notification', {
                     restaurant: chat.restaurant.restaurantName,
                     restaurantID: chat.restaurant.id,
@@ -167,13 +166,11 @@ io.on('connection', (socket) => {
 
     socket.on('updateLocation', async (data) => {
         const { reservationID, location } = data;
-        console.log('Received location:', location);
         try {
             const reservation = await Reservation.findById(reservationID);
             if (reservation) {
                 reservation.locationCustomer = location;
                 await reservation.save();
-                console.log('Location updated:', location);
 
 
                 io.to(reservationID).emit('locationUpdated', {
@@ -195,7 +192,6 @@ io.on('connection', (socket) => {
             }
 
             const reservationId = reservation._id;
-            console.log('Found Reservation ID:', reservationId);
             const formData = new FormData();
             formData.append('files', Buffer.from(fileBuffer), fileName);
             const response = await axios.post('https://api.slipok.com/api/line/apikey/37351', formData, {

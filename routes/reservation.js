@@ -92,7 +92,7 @@ router.get('/getReservationsById/:id', async function (req, res, next) {
             .populate("orderedFood.selectedAddons")
             .populate("restaurant_id", "-restaurantIcon")
             .sort({ createdAt: -1 });
-        console.log(result)
+
         res.json(result);
     } catch (error) {
         res.status(500).send(error);
