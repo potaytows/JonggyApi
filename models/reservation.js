@@ -111,12 +111,12 @@ const reservationSchema = new mongoose.Schema({
             type: Date
         }
     }, approval: {
-        cancelledBy: {
+        aprrovedBy: {
             type: String,
-        }, cancelledAt: {
+        }, approvedAt: {
             type: Date
         }
-    },  wwtransfer_slip: {
+    },  transfer_slip: {
         data: Buffer,
         contentType: String
     },

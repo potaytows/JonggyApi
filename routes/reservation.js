@@ -51,7 +51,7 @@ router.get('/getReservationByRestaurantID/:id', async function (req, res, next) 
         .populate("orderedFood.selectedMenuItem", "-menu_icon")
         .populate("orderedFood.selectedAddons")
         .populate("restaurant_id", "-restaurantIcon")
-        .sort({ createdAt: 1 })
+        .sort({ createdAt: -1 })
         res.json(result)
     } catch (error) {
         res.send(error)
@@ -106,7 +106,7 @@ router.get('/getActiveReservation/:username', async function (req, res, next) {
 
         const filter = { 
             username: username, 
-            status: { $ne: "ยืนยันแล้ว" } 
+            status: { $ne: "เสร็จสิ้นแล้ว" } 
         };
 
         if (restaurantId) {
