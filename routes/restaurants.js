@@ -81,9 +81,11 @@ router.post('/uploadImage/:id', upload.single('image'), async function (req, res
 
 router.post('/editDetails/:id', async function (req, res, next) {
     try {
+        console.log(req.body)
         const newRestaurant = await RestaurantModel.findOneAndUpdate({
             '_id': req.params.id
         }, { $set: req.body }, { new: true })
+        console.log(newRestaurant)
         newRestaurant.save();
         res.send({ "status": "Edit Succesfully" })
     } catch (error) {
