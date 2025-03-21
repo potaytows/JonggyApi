@@ -97,7 +97,7 @@ router.post('/addBankAccount', async (req, res) => {
     }
 });
 router.post('/withdraw', async (req, res) => {
-    const { restaurant_id, amount,bankName,accountName,accountNumber } = req.body;
+    const { restaurant_id, amount, bankName, accountName, accountNumber } = req.body;
 
     try {
         const wallet = await WalletModel.findOne({ restaurant_id });
@@ -109,7 +109,7 @@ router.post('/withdraw', async (req, res) => {
         }
 
         wallet.wallet.balance -= amount;
-        wallet.wallet.withdrawals.push({ amount,bankName,accountName,accountNumber, status: "pending" });
+        wallet.wallet.withdrawals.push({ amount, bankName, accountName, accountNumber, status: "pending" });
         await wallet.save();
 
         return res.status(200).json({ message: "คำขอถอนเงินถูกส่งเรียบร้อยแล้ว" });
@@ -117,6 +117,34 @@ router.post('/withdraw', async (req, res) => {
         return res.status(500).json({ message: "เกิดข้อผิดพลาด", error });
     }
 });
+router.post('/add-totalsummary/:restaurant_id', async (req, res) => {
+    const {  totalsummary } = req.body;
+    const {restaurant_id} = req.params
+    console.log(req.body);
+
+    if (!restaurant_id || totalsummary === undefined) {
+        return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    try {
+        const wallet = await WalletModel.findOne({ restaurant_id });
+        if (!wallet) {
+            return res.status(404).json({ message: 'Wallet not found' });
+        }
+        wallet.wallet.dasbaord.push({
+            totalsummary,
+            date: new Date(),
+        });
+        await wallet.save();
+
+        res.status(200).json({ message: 'Totalsummary added successfully', wallet });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
 
 
 module.exports = router;

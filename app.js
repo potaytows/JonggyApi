@@ -130,10 +130,16 @@ io.on('connection', (socket) => {
             const newMessage = {
                 sender: data.sender,
                 message: data.message,
+                type: data.type,
                 timestamp: new Date(),
-                readStatus: 'notRead'
+                readStatus: 'notRead'   
             };
 
+            if (data.type === 'image' && data.imageFile) {
+                // Assuming `data.imageFile` is a file object received through the socket
+                const buffer = data.imageFile.buffer;
+                newMessage.message = buffer.toString('base64');  // Convert image buffer to base64
+            }
 
             for (const socketId in connectedUsers) {
                 if (connectedUsers[socketId].roomId === data.reservationID) {
@@ -205,13 +211,10 @@ io.on('connection', (socket) => {
             console.log('SlipOK Response:', payments);
             const { transRef, transTime, transDate, sender, receiver, amount } = response.data.data;
             if (receiver && receiver.name === 'MR. TAKACHI Y') {
-                console.log('Receiver name matches:', receiver.name);
 
                 if (amount === totalP) {
-                    console.log('Amount matches:', amount);
 
                     if (transRef) {
-                        console.log('Transaction reference exists:', transRef);
 
                         const existingReservation = await Reservation.findOne({ 'Payment.transRef': transRef }).exec();
                         if (existingReservation) {
@@ -232,6 +235,7 @@ io.on('connection', (socket) => {
                             status: 'success',
                         };
                         reservation.Payment.push(paymentData);
+                        console.log(paymentData)
                         await reservation.save();
 
                         const wallet = await Wallet.findOne({ restaurant_id }).exec();
