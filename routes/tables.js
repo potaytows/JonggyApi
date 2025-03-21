@@ -118,6 +118,7 @@ router.post('/checkconflictedreservedTables', async function (req, res) {
         const conflictingReservations = await ReservationModel.find({
             restaurant_id,
             reservedTables: { $in: reservedTables },
+            status: "ยืนยันแล้ว",
             $or: [
                 { startTime: { $lt: end }, endTime: { $gt: start } },
             ]

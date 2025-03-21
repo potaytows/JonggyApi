@@ -26,7 +26,11 @@ const WalletSchema = new mongoose.Schema({
             bankName: { type: String, required: true },
             accountName: { type: String, required: true },
             accountNumber: { type: String, required: true },
-        }]
+        }],
+        dasbaord: [{
+            totalsummary: { type: Number, required: true ,default: 0}, // จำนวนเงินก่อนหักภาษี
+            date: { type: Date, default: Date.now }
+        }],
     }
 
 }, { timestamps: true })

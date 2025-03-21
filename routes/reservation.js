@@ -34,6 +34,11 @@ router.post('/reserveTables', async function (req, res, next) {
         newReservation.status = "รอการยืนยัน";
         await newReservation.save();
 
+        await CartModel.deleteMany({
+            username: req.body.username,
+            restaurantId: req.body.restaurant_id
+        });
+
         res.send({ status: "reserved successfully", obj: newReservation });
     } catch (error) {
         res.send(error);
@@ -236,7 +241,8 @@ router.get('/getReservedTimes/:restaurantId', async (req, res) => {
     try {
         const currentTime = moment.tz('Asia/Bangkok');
 
-        const reservations = await ReservationModel.find({ restaurant_id: restaurantId })
+        const reservations = await ReservationModel.find({ restaurant_id: restaurantId ,status: { $nin: ["ยกเลิกการจองแล้ว", "เสร็จสิ้นแล้ว"] },
+})
             .select('reservedTables startTime endTime')
             .populate('reservedTables', 'text');
 

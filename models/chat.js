@@ -22,6 +22,11 @@ const chatSchema = new mongoose.Schema({
         enum: ['customer', 'restaurant'],
         required: true
       },
+      type: {
+        type: String,
+        enum: ['text', 'image'],
+        required: true
+      },
       message: {
         type: String,
         required: true
@@ -32,8 +37,8 @@ const chatSchema = new mongoose.Schema({
       },
       readStatus: {
         type: String,
-        default: "notRead" 
-        }
+        default: "notRead"
+      }
     }
   ]
 });
