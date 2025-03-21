@@ -172,7 +172,7 @@ router.put('/confirmReservation/:id', async function (req, res, next) {
 });
 router.put('/successReservation/:id', async function (req, res, next) {
     try {
-        const result = await ReservationModel.findByIdAndUpdate(req.params.id, { status: "เสร้จสิ้นแล้ว" }, { new: true });
+        const result = await ReservationModel.findByIdAndUpdate(req.params.id, { status: "เสร็จสิ้นแล้ว" }, { new: true });
         if (result) {
             res.send({ status: "confirmed successfully", obj: result });
         } else {

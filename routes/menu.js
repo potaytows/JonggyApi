@@ -31,7 +31,7 @@ router.get('/getMenus/:id', async function (req, res, next) {
             // Match reservations for the specific restaurant and only include "ยืนยันแล้ว" status
             { $match: { 
                 restaurant_id: new mongoose.Types.ObjectId(id),
-                status: "ยืนยันแล้ว" // Only include reservations with this status
+                status: {$in:['ยืนยันแล้ว',"เสร็จสิ้นแล้ว"]}, 
             } },
 
             // Unwind the orderedFood array to flatten the structure
@@ -99,7 +99,7 @@ router.get('/getMenusByUsername/:id', async function (req, res, next) {
             // Match reservations for the specific restaurant and only include "ยืนยันแล้ว" status
             { $match: { 
                 restaurant_id: new mongoose.Types.ObjectId(restaurant._id),
-                status: "ยืนยันแล้ว" // Only include reservations with this status
+                status: {$in:['ยืนยันแล้ว',"เสร็จสิ้นแล้ว"]},
             } },
 
             // Unwind the orderedFood array to flatten the structure
@@ -265,7 +265,7 @@ async function countMenuOrders(menuId, daysAgo = 0) {
         {
             $match: {
                 'orderedFood.selectedMenuItem': { $in: [menuObjectId] },  // Match the selected menu item
-                status: 'ยืนยันแล้ว',  // Only consider orders with confirmed status
+                status: {$in:['ยืนยันแล้ว',"เสร็จสิ้นแล้ว"]},  // Only consider orders with confirmed status
                 createdAt: {
                     $gte: pastDate,  // Ensure startTime is greater than or equal to pastDate
                     $lte: today      // Ensure startTime is less than or equal to today
