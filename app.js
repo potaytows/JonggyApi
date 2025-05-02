@@ -308,7 +308,7 @@ io.on('connection', (socket) => {
     });
 });
 
-const uri = "mongodb+srv://finalProject:EFpeUnSek3qtwsMf@cluster0.xoovbhu.mongodb.net/finalProject?retryWrites=true&w=majority";
+const uri =process.env.MONGODBURI;
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         server.listen(8000, () => {
