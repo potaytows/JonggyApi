@@ -27,7 +27,7 @@ Then run
 ```bash
   $ node app.js
 ```
-But it is reccomended to use `nodemon`
+It is reccomended to use `nodemon` (for development) 
 
 To install nodemon run 
 
